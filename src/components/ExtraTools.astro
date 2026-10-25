@@ -1,0 +1,141 @@
+---
+import Upload from './Upload.astro';
+import Watermark from './Watermark.astro';
+const { slug } = Astro.props;
+---
+
+{slug === 'pdf-export' && (
+  <>
+    <Upload accept="application/pdf" multiple={false} hint="Один PDF · до 25 МБ" />
+    <div class="field-row">
+      <div class="field">
+        <label for="export-format">Формат результата</label>
+        <select id="export-format">
+          <option value="image/jpeg">JPG</option>
+          <option value="image/png">PNG</option>
+          <option value="text">Текст TXT</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="export-dpi">Разрешение изображений</label>
+        <select id="export-dpi">
+          <option value="100">100 DPI</option>
+          <option value="150" selected>
+            150 DPI
+          </option>
+          <option value="200">200 DPI</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="export-range">Страницы</label>
+      <input id="export-range" placeholder="Все или 1–3, 7" />
+    </div>
+    <p class="note">
+      TXT извлекает существующий текстовый слой. Для сканов без текстового слоя нужен OCR, которого
+      здесь нет. Порядок текста зависит от структуры PDF.
+    </p>
+    <button class="button" id="process">
+      Экспортировать страницы
+    </button>
+    <div class="result-box" id="results"></div>
+  </>
+)}
+{slug === 'qr-reader' && (
+  <>
+    <Upload
+      accept="image/jpeg,image/png,image/webp"
+      multiple={false}
+      hint="Скриншот или фото с одним QR-кодом"
+    />
+    <div class="note">
+      Ссылка не открывается автоматически. Данные Wi-Fi и контактов показываются как текст.
+      Изображение не отправляется на сервер.
+    </div>
+    <label for="qr-decoded">Содержимое QR-кода</label>
+    <textarea id="qr-decoded" rows="7" readonly spellcheck="false"></textarea>
+    <div class="actions">
+      <button class="button" id="process">
+        Прочитать QR-код
+      </button>
+      <button class="button secondary" id="qr-copy">
+        Скопировать текст
+      </button>
+      <button class="button secondary" id="qr-read-clear">
+        Очистить
+      </button>
+    </div>
+  </>
+)}
+{slug === 'scan-tools' && (
+  <>
+    <Upload
+      accept="image/jpeg,image/png,image/webp"
+      multiple={false}
+      hint="Один скан или фотография документа"
+    />
+    <div class="split-workspace">
+      <div class="control-panel">
+        <div class="field">
+          <label for="scan-angle">Выравнивание, градусов</label>
+          <input id="scan-angle" type="number" min="-15" max="15" step="0.1" value="0" />
+        </div>
+        <div class="field">
+          <label for="scan-trim">Обрезать края, % с каждой стороны</label>
+          <input id="scan-trim" type="number" min="0" max="30" value="0" />
+        </div>
+        <div class="field">
+          <label for="scan-contrast">Контраст, %</label>
+          <input id="scan-contrast" type="number" min="50" max="250" value="120" />
+        </div>
+        <div class="field">
+          <label for="scan-brightness">Яркость, %</label>
+          <input id="scan-brightness" type="number" min="50" max="180" value="105" />
+        </div>
+        <label class="check-label">
+          <input id="scan-gray" type="checkbox" checked />
+          Чёрно-белый скан
+        </label>
+        <p class="note">
+          Ручное выравнивание, без распознавания текста и автоматического исправления перспективы.
+          Проверьте края и мелкий текст.
+        </p>
+        <button class="button" id="process">
+          Подготовить скан
+        </button>
+      </div>
+      <div class="preview-panel" id="scan-preview">
+        <p class="preview-placeholder">Здесь появится предпросмотр</p>
+      </div>
+    </div>
+    <div class="result-box" id="results"></div>
+  </>
+)}
+{slug === 'pdf-watermark' && (
+  <>
+    <Upload
+      accept="application/pdf"
+      multiple={false}
+      hint="Один PDF · без пароля и цифровой подписи"
+    />
+    <Watermark pdf={true} />
+    <div class="field">
+      <label for="mark-range">Страницы</label>
+      <input id="mark-range" placeholder="Все или 1–3, 7" />
+    </div>
+    <button class="button secondary" id="mark-preview-button">
+      Предпросмотр выбранной страницы
+    </button>
+    <div class="preview-panel" id="mark-preview">
+      <p class="note">Здесь появится предпросмотр</p>
+    </div>
+    <p class="note">
+      Водяной знак не является электронной подписью и не защищает от копирования. Он не удаляет и не
+      скрывает исходное содержимое.
+    </p>
+    <button class="button" id="process">
+      Добавить водяной знак
+    </button>
+    <div class="result-box" id="results"></div>
+  </>
+)}

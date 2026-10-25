@@ -1,0 +1,105 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { readFileSync } from 'node:fs';
+const names = ['astro', 'pdf-lib', 'pdfjs-dist', 'qrcode', 'pica', 'exifr', 'jszip', 'jsqr'];
+const packages = names.map((name) => {
+  const p = JSON.parse(readFileSync(`${process.cwd()}/node_modules/${name}/package.json`, 'utf8'));
+  return {
+    name,
+    version: p.version,
+    license: p.license,
+    homepage: p.homepage || `https://www.npmjs.com/package/${name}`,
+  };
+});
+const uses: Record<string, string> = {
+  astro: 'Сборка HTML-страниц (на этапе разработки)',
+  'pdf-lib': 'Создание и изменение PDF',
+  'pdfjs-dist': 'Предпросмотр и растеризация PDF',
+  qrcode: 'QR-коды',
+  pica: 'Изменение размера изображений',
+  exifr: 'Чтение метаданных',
+  jszip: 'Создание ZIP-архивов',
+  jsqr: 'Чтение QR-кодов из изображений',
+};
+---
+
+<Layout
+  title="Библиотеки и исходный код"
+  description="Библиотеки Toolsiano: версии, лицензии, назначение зависимостей и скачивание исходного кода для самостоятельной проверки локальной обработки файлов."
+>
+  <article class="prose">
+    <div class="eyebrow">ПРОЗРАЧНОСТЬ ВМЕСТО ОБЕЩАНИЙ</div>
+    <h1>Что внутри Toolsiano</h1>
+    <p class="lead">
+      Открытые библиотеки, локальная обработка и исходный код, который можно изучить и собрать
+      самостоятельно.
+    </p>
+    <div class="note">
+      Открытый код помогает проверке, но сам по себе не гарантирует отсутствие ошибок. Список ниже
+      формируется из фактически установленных пакетов при сборке.
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Библиотека</th>
+            <th>Версия</th>
+            <th>Задача</th>
+            <th>Лицензия</th>
+          </tr>
+        </thead>
+        <tbody>
+          {packages.map((p) => (
+            <tr>
+              <td>
+                <a href={p.homepage} target="_blank" rel="noopener noreferrer">
+                  {p.name}
+                </a>
+              </td>
+              <td>{p.version}</td>
+              <td>{uses[p.name]}</td>
+              <td>{typeof p.license === 'string' ? p.license : 'См. пакет'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <h2>Исходники именно этой сборки</h2>
+    <p>
+      Архив содержит исходный код приложения, конфигурацию Docker, инструкцию, тесты и файл фиксации
+      зависимостей. Старый сайт, ключи и пользовательские файлы в него не входят.
+    </p>
+    <p>
+      <a href="/toolsiano-source.zip" download>
+        Скачать исходный код ZIP
+      </a>{' '}
+      · <a href="/build-info.json">Сведения о сборке и SHA-256</a> ·{' '}
+      <a href="/third-party-licenses.txt" download>
+        Лицензии зависимостей
+      </a>
+    </p>
+    <p>
+      Ссылка на GitHub появится после переноса в ваш репозиторий. До этого исходники доступны в
+      архиве: мы не подставляем ссылку на несуществующий репозиторий.
+    </p>
+    <h2>Как устроена поставка</h2>
+    <p>
+      npm фиксирует зависимости в <code>package-lock.json</code>. Команда <code>npm ci</code>{' '}
+      устанавливает их для сборки. Готовый сайт состоит из статических файлов. Браузер не обращается
+      к npm и CDN во время обработки документов.
+    </p>
+    <h2>Как проверить выпуск</h2>
+    <p>
+      Запустите <code>npm ci</code>, <code>npm run check</code>, <code>npm test</code> и{' '}
+      <code>npm run build</code>. Для проверки запросов, офлайн-режима и реальных документов
+      предусмотрены браузерные тесты. Совпадение хешей файлов полезно для контроля целостности, но
+      не является независимым аудитом безопасности.
+    </p>
+    <h2>Лицензия приложения</h2>
+    <p>
+      Собственный код новой версии распространяется под MIT. Права на сторонние библиотеки
+      принадлежат их авторам и регулируются указанными лицензиями. Копии лицензионных уведомлений
+      включены в выпуск.
+    </p>
+  </article>
+</Layout>

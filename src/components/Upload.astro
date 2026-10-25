@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+const {
+  id = 'files',
+  accept = '',
+  multiple = true,
+  title = 'Выберите файлы или перетащите сюда',
+  hint = 'Файлы обрабатываются только на этом устройстве',
+} = Astro.props;
+---
+
+<label class="dropzone" for={id}>
+  <Icon name="upload" size={29} />
+  <strong>{title}</strong>
+  <small id={`${id}-hint`}>{hint}</small>
+  <input id={id} type="file" accept={accept} multiple={multiple} aria-describedby={`${id}-hint`} />
+</label>

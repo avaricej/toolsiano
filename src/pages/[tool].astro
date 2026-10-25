@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ToolUI from '../components/ToolUI.astro';
+import { tools } from '../data/tools';
+import { guides } from '../data/guides';
+export function getStaticPaths() {
+  return tools.map((tool) => ({ params: { tool: tool.slug }, props: { tool } }));
+}
+const { tool } = Astro.props;
+const guide = guides[tool.slug];
+---
+
+<Layout
+  title={tool.name}
+  description={
+    tool.description + ' Обработка на вашем устройстве, без отправки содержимого на сервер.'
+  }
+  active={tool.slug}
+>
+  <section class="tool-heading">
+    <a class="back-link" href="/">
+      ← Все инструменты
+    </a>
+    <div class="tool-heading-title">
+      <span class={`tool-icon ${tool.color}`}>
+        <Icon name={tool.icon} size={26} />
+      </span>
+      <h1>{tool.name}</h1>
+    </div>
+    <p>{tool.description}</p>
+    <div class="privacy-strip">
+      <Icon name="lock" size={14} />
+      Данные обрабатываются на этом устройстве<a href="/security/">Как это проверить</a>
+    </div>
+  </section>
+  <section class="workspace" data-tool={tool.slug} aria-label={tool.name}>
+    <ToolUI slug={tool.slug} />
+  </section>
+  <div class="tool-docs">
+    <section>
+      <h2>Как пользоваться</h2>
+      <ol>
+        {guide.steps.map((step) => (
+          <li>{step}</li>
+        ))}
+      </ol>
+      <h3>Форматы и результат</h3>
+      <p>{guide.formats}</p>
+      <h3>Что учитывать</h3>
+      <p>{guide.note}</p>
+    </section>
+    <section>
+      <h2>Прозрачная работа</h2>
+      <p>
+        {tool.libraries.length
+          ? 'Библиотеки: ' + tool.libraries.join(', ') + '.'
+          : 'Используются встроенные возможности браузера.'}{' '}
+        Исполняемый код и библиотеки загружаются с этого же сайта.{' '}
+        <a href="/libraries/">Версии, лицензии и исходники</a>.
+      </p>
+      <p>
+        Ограничения: память устройства, поддержка форматов браузером и особенности исходного файла.
+        Оригиналы не изменяются.
+      </p>
+    </section>
+  </div>
+  <script>
+    import '../scripts/tools';
+  </script>
+</Layout>

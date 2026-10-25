@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { tools, categories } from '../data/tools';
+---
+
+<Layout>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">
+        <span class="status-dot"></span>ПРОСТО. ПРИВАТНО. НА ВАШЕМ УСТРОЙСТВЕ.
+      </div>
+      <h1>
+        Ваши файлы.
+        <br />
+        <span>Ваше пространство.</span>
+      </h1>
+      <p class="hero-description">
+        Полезные инструменты для повседневных задач.
+        <br />
+        Без регистрации, отправки файлов и лишних сложностей.
+      </p>
+      <div class="hero-features">
+        <span>
+          <Icon name="shield" size={16} />
+          Локальная обработка
+        </span>
+        <span>
+          <Icon name="bolt" size={16} />
+          Бесплатно
+        </span>
+        <span>
+          <Icon name="globe" size={16} />
+          Работает офлайн*
+        </span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-grid"></div>
+      <div class="art-card art-pdf">
+        <Icon name="file-plus" size={34} />
+        <span>document.pdf</span>
+        <small>Готово к работе</small>
+      </div>
+      <div class="art-card art-img">
+        <Icon name="image" size={45} />
+        <div class="art-landscape">
+          <span></span>
+        </div>
+        <span>Только на вашем устройстве</span>
+      </div>
+      <div class="art-lock">
+        <Icon name="lock" size={25} />
+      </div>
+      <div class="art-label">
+        <span class="status-dot"></span>Никаких загрузок на сервер
+      </div>
+    </div>
+  </section>
+  <section class="catalog" aria-labelledby="catalog-title">
+    <div class="section-heading">
+      <div>
+        <h2 id="catalog-title">
+          Все инструменты <span class="heading-count">{tools.length}</span>
+        </h2>
+        <p>Выберите задачу. Остальное — дело нескольких кликов.</p>
+      </div>
+      <label class="search-field">
+        <Icon name="search" size={19} />
+        <input
+          id="tool-search"
+          type="search"
+          placeholder="Найти инструмент…"
+          aria-label="Найти инструмент"
+        />
+        <kbd>/</kbd>
+      </label>
+    </div>
+    <div class="filters" role="group" aria-label="Категории">
+      {categories.map((c, i) => (
+        <button
+          class:list={['filter', { active: i === 0 }]}
+          data-filter={c}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+        >
+          {c}
+        </button>
+      ))}
+    </div>
+    <div class="tool-grid" id="tool-grid">
+      {tools.map((t) => (
+        <a
+          class="tool-card"
+          href={`/${t.slug}/`}
+          data-category={t.category}
+          data-search={`${t.name} ${t.description} ${t.tag}`}
+        >
+          <div class="card-top">
+            <span class={`tool-icon ${t.color}`}>
+              <Icon name={t.icon} size={25} />
+            </span>
+            <span class="card-arrow">
+              <Icon name="arrow" size={19} />
+            </span>
+          </div>
+          <h3>{t.name}</h3>
+          <p>{t.description}</p>
+          <div class="card-bottom">
+            <span>{t.tag}</span>
+            <Icon name="lock" size={13} />
+          </div>
+        </a>
+      ))}
+    </div>
+    <p id="empty-search" class="empty-state" hidden>
+      Ничего не найдено. Попробуйте «PDF», «пароль» или другую категорию.
+    </p>
+    <p id="search-status" class="sr-only" aria-live="polite"></p>
+  </section>
+  <section class="trust-panel">
+    <div class="trust-emblem">
+      <Icon name="shield" size={34} />
+    </div>
+    <div>
+      <h2>Ваши данные не нужны нам для работы.</h2>
+      <p>
+        Файлы обрабатываются в браузере. Без сторонних трекеров и скрытых отправок.
+        <br />
+        Проверьте, как всё устроено, и узнайте об ограничениях.
+      </p>
+    </div>
+    <a class="button secondary" href="/security/">
+      О приватности <Icon name="arrow" size={17} />
+    </a>
+  </section>
+  <p class="footnote">
+    * После предварительного скачивания ресурсов через кнопку внизу страницы. Размер файлов
+    ограничен памятью устройства.
+  </p>
+</Layout>

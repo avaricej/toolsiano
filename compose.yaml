@@ -1,0 +1,22 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        PUBLIC_EN_ORIGIN: ${PUBLIC_EN_ORIGIN:-https://toolsiano.com}
+        PUBLIC_RU_ORIGIN: ${PUBLIC_RU_ORIGIN:-https://toolsiano.ru}
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  caddy_data:
+  caddy_config:

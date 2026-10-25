@@ -1,0 +1,161 @@
+---
+import Icon from '../components/Icon.astro';
+import OfflineDialog from '../components/OfflineDialog.astro';
+import { tools } from '../data/tools';
+import '../styles/global.css';
+const {
+  title = 'Инструменты для изображений, PDF, паролей и QR-кодов',
+  description = 'Изображения, PDF, пароли и QR-коды. Локальная обработка в браузере, без регистрации и отправки файлов.',
+  active = '',
+  noindex = false,
+} = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#15745b" />
+    {noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <link rel="canonical" href={new URL(path, Astro.site)} />
+    )}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/app-180.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>{title} — Toolsiano</title>
+    <script is:inline src="/theme.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Перейти к содержимому
+    </a>
+    <aside class="sidebar" id="sidebar" aria-label="Основная навигация">
+      <a class="brand" href="/" aria-label="Toolsiano — главная">
+        <img class="brand-mark" src="/favicon.svg" width="40" height="40" alt="" />
+        <span>
+          Toolsiano<small>БЕЗОПАСНАЯ И ПРИВАТНАЯ РАБОТА С ФАЙЛАМИ</small>
+        </span>
+      </a>
+      <a class:list={['nav-link', { selected: path === '/' }]} href="/">
+        <Icon name="grid" size={19} />
+        Все инструменты<span class="count">{tools.length}</span>
+      </a>
+      <div class="nav-section">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      {['Изображения', 'PDF', 'QR и безопасность'].map((cat) => (
+        <div class="nav-group">
+          <span class="nav-group-label">{cat}</span>
+          {tools
+            .filter((t) => t.category === cat)
+            .map((t) => (
+              <a
+                href={`/${t.slug}/`}
+                class:list={['nav-link', { selected: active === t.slug }]}
+                aria-current={active === t.slug ? 'page' : undefined}
+              >
+                <Icon name={t.icon} size={18} />
+                {t.short}
+              </a>
+            ))}
+        </div>
+      ))}
+      <div class="sidebar-bottom">
+        <a
+          class:list={['nav-link', { selected: path === '/download/' }]}
+          href="/download/"
+          aria-current={path === '/download/' ? 'page' : undefined}
+        >
+          <Icon name="download" size={18} />
+          Скачать приложение
+        </a>
+        <a class="nav-link" href="/security/">
+          <Icon name="shield" size={18} />
+          Приватность
+        </a>
+        <a class="nav-link" href="/libraries/">
+          <Icon name="code" size={18} />
+          Библиотеки и код
+        </a>
+        <div class="local-note">
+          <span class="status-dot"></span>Ваши файлы остаются у вас
+          <small>Обработка на этом устройстве</small>
+        </div>
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button
+            class="icon-button mobile-toggle"
+            id="menu-toggle"
+            aria-label="Открыть меню"
+            aria-expanded="false"
+            aria-controls="sidebar"
+          >
+            <Icon name="menu" />
+          </button>
+          <span class="breadcrumb">
+            Рабочее пространство <span>/</span>{' '}
+            <strong>
+              {active
+                ? tools.find((t) => t.slug === active)?.short
+                : path === '/security/'
+                  ? 'Приватность'
+                  : path === '/libraries/'
+                    ? 'Библиотеки'
+                    : path === '/download/'
+                      ? 'Скачать приложение'
+                      : path === '/about/'
+                        ? 'О проекте'
+                        : 'Все инструменты'}
+            </strong>
+          </span>
+        </div>
+        <div class="topbar-actions">
+          <a
+            id="language-switch"
+            class="language-switch"
+            href="/en/"
+            lang="en"
+            aria-label="Switch to English"
+          >
+            EN
+          </a>
+          <span class="local-pill">
+            <Icon name="lock" size={14} />
+            Локально в браузере
+          </span>
+          <button id="theme-toggle" class="icon-button" aria-label="Переключить тему">
+            <Icon name="sun" size={20} />
+          </button>
+        </div>
+      </header>
+      <main id="main">
+        <slot />
+      </main>
+      <footer class="footer">
+        <span>
+          © {new Date().getFullYear()} Toolsiano{' '}
+          <span class="muted">· Сделано с уважением к вашим данным</span>
+        </span>
+        <div>
+          <a href="/about/">О проекте</a>
+          <a href="/download/">Скачать приложение</a>
+          <a href="/security/">Приватность</a>
+          <button id="offline-install" class="text-button">
+            Офлайн-доступ
+          </button>
+        </div>
+      </footer>
+    </div>
+    <OfflineDialog />
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script>
+      import '../scripts/shell';
+    </script>
+  </body>
+</html>

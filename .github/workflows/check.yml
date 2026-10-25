@@ -1,0 +1,40 @@
+name: Check application
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        with:
+          name: toolsiano-dist-${{ matrix.browser }}
+          path: dist
+          retention-days: 14
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t toolsiano:test .
+      - run: docker run -d --name toolsiano-test -p 8080:80 -e SITE_ADDRESS=:80 toolsiano:test
+      - run: curl --fail --retry 10 --retry-connrefused --retry-delay 1 http://localhost:8080/ru/
+      - run: test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ru/missing/)" = 404
+      - if: always()
+        run: docker rm -f toolsiano-test

@@ -1,0 +1,34 @@
+<dialog id="offline-dialog" aria-labelledby="offline-title" aria-describedby="offline-description">
+  <div class="dialog-heading">
+    <h2 id="offline-title">Офлайн-доступ</h2>
+    <button type="button" id="offline-close" class="button secondary" autofocus>
+      Закрыть
+    </button>
+  </div>
+  <p id="offline-description">
+    Страницы и инструменты сохраняются в этом браузере для текущего домена. Файл в папке «Загрузки»
+    не создаётся.
+  </p>
+  <p id="offline-state" class="note" role="status" aria-live="polite">
+    Проверяем офлайн-копию…
+  </p>
+  <progress
+    id="offline-progress"
+    max="100"
+    value="0"
+    aria-label="Сохранение офлайн-копии"
+    hidden
+  ></progress>
+  <div class="actions">
+    <button type="button" class="button" id="offline-save">
+      Сохранить офлайн-копию
+    </button>
+    <button type="button" class="button secondary" id="offline-remove" disabled>
+      Удалить офлайн-копию
+    </button>
+  </div>
+  <p class="muted">
+    Ваши файлы, пароли и введённые данные в копию не включаются. Браузер может удалить копию при
+    очистке данных сайта или нехватке места.
+  </p>
+</dialog>

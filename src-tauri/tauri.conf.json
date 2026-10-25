@@ -1,0 +1,61 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Toolsiano",
+  "version": "1.0.0",
+  "identifier": "com.toolsiano.desktop",
+  "build": {
+    "beforeDevCommand": "npm run desktop:frontend",
+    "beforeBuildCommand": "npm run desktop:frontend",
+    "frontendDist": "../work/desktop-dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "create": false,
+        "title": "Toolsiano",
+        "width": 1100,
+        "height": 700,
+        "minWidth": 720,
+        "minHeight": 480,
+        "preventOverflow": true,
+        "url": "index.html",
+        "useHttpsScheme": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "capabilities": ["main"],
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' blob: ipc: http://ipc.localhost https://ipc.localhost; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Utility",
+    "shortDescription": "Private offline tools for files",
+    "publisher": "Toolsiano",
+    "copyright": "Copyright (c) 2026 Toolsiano",
+    "licenseFile": "../LICENSE",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "offlineInstaller", "silent": true },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "template": "installer/template.nsi",
+        "installerHooks": "installer/licenses.nsh",
+        "installMode": "currentUser",
+        "languages": ["English", "Russian"],
+        "displayLanguageSelector": true
+      }
+    },
+    "macOS": { "minimumSystemVersion": "11.0" }
+  }
+}

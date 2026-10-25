@@ -1,0 +1,44 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+.astro/
+*.tsbuildinfo
+src-tauri/target/
+src-tauri/gen/
+
+# Local tools, test runs, screenshots and audit reports
+work/
+outputs/
+test-results/
+playwright-report/
+blob-report/
+coverage/
+.nyc_output/
+/toolsiano-qr.svg
+
+# Local environment and signing credentials
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.keystore
+
+# Logs, caches and temporary files
+*.log
+*.pid
+*.tmp
+*.temp
+.cache/
+.tmp/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

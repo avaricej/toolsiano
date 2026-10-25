@@ -1,0 +1,422 @@
+---
+import Upload from './Upload.astro';
+import Icon from './Icon.astro';
+import ExtraTools from './ExtraTools.astro';
+import Watermark from './Watermark.astro';
+const { slug } = Astro.props;
+---
+
+<p id="tool-loading" class="note" role="status">
+  Загружаем локальные модули инструмента…
+</p>
+<fieldset id="tool-controls" disabled>
+  <legend class="sr-only">Настройки инструмента</legend>
+  {['image-tools', 'meta-remover'].includes(slug) && (
+    <>
+      <Upload
+        accept="image/jpeg,image/png,image/webp"
+        multiple={true}
+        hint="JPG, PNG, WebP · до 25 МБ на файл"
+      />
+      <div id="file-list"></div>
+      {slug === 'image-tools' && (
+        <p class="note">
+          Предпросмотр относится к первому файлу. Пустые размеры сохраняют исходный размер каждого
+          изображения.
+        </p>
+      )}
+      <div class="split-workspace">
+        <div class="control-panel">
+          {slug === 'image-tools' ? (
+            <>
+              <div class="field">
+                <label for="image-format">Формат результата</label>
+                <select id="image-format">
+                  <option value="image/webp">WebP</option>
+                  <option value="image/jpeg">JPEG</option>
+                  <option value="image/png">PNG</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="image-quality">
+                  Качество <output id="quality-value">85%</output>
+                </label>
+                <input type="range" id="image-quality" min="10" max="100" value="85" />
+                <small>PNG сохраняется без потерь; качество для него не применяется.</small>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="image-width">Ширина, px</label>
+                  <input
+                    id="image-width"
+                    type="number"
+                    min="1"
+                    max="12000"
+                    placeholder="Исходная"
+                  />
+                </div>
+                <div class="field">
+                  <label for="image-height">Высота, px</label>
+                  <input
+                    id="image-height"
+                    type="number"
+                    min="1"
+                    max="12000"
+                    placeholder="Исходная"
+                  />
+                </div>
+              </div>
+              <label class="check-label">
+                <input id="image-ratio" type="checkbox" checked />
+                Сохранять пропорции
+              </label>
+              <div class="field">
+                <label for="image-rotate">Поворот</label>
+                <select id="image-rotate">
+                  <option value="0">Без поворота</option>
+                  <option value="90">90° по часовой</option>
+                  <option value="180">180°</option>
+                  <option value="270">270° по часовой</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="image-crop">Обрезка по центру</label>
+                <select id="image-crop">
+                  <option value="none">Без обрезки</option>
+                  <option value="1">Квадрат 1:1</option>
+                  <option value="1.333333">4:3</option>
+                  <option value="1.777778">16:9</option>
+                  <option value="0.75">3:4</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="image-filter">Фильтр</label>
+                <select id="image-filter">
+                  <option value="none">Оригинал</option>
+                  <option value="grayscale(1)">Чёрно-белый</option>
+                  <option value="sepia(1)">Сепия</option>
+                  <option value="contrast(1.2) saturate(1.15)">Контрастный</option>
+                </select>
+              </div>
+              <Watermark />
+            </>
+          ) : (
+            <>
+              <h3>Очистка метаданных</h3>
+              <p class="muted">
+                JPEG и PNG очищаются без перекодирования пикселей, когда ориентация позволяет. WebP
+                и повёрнутые JPEG перекодируются.
+              </p>
+              <div class="note">
+                Проверьте цвет и ориентацию результата. ICC-профиль JPEG удаляется. Анимация не
+                поддерживается. Видимые надписи на фото останутся.
+              </div>
+            </>
+          )}
+          <button class="button" id="process">
+            {slug === 'meta-remover' ? 'Удалить метаданные' : 'Обработать изображения'}
+          </button>
+        </div>
+        <div class="preview-panel">
+          <div id="image-preview" class="preview-placeholder">
+            <Icon name="image" size={44} />
+            Здесь появится предпросмотр
+          </div>
+          <label class="check-label" id="compare-control" hidden>
+            <input id="image-compare" type="checkbox" />
+            Показать оригинал для сравнения
+          </label>
+          <div id="metadata"></div>
+        </div>
+      </div>
+      <div id="results" class="result-box"></div>
+    </>
+  )}
+  {slug === 'pdf' && (
+    <>
+      <Upload
+        accept="image/jpeg,image/png,image/webp"
+        hint="JPG, PNG, WebP · несколько изображений"
+      />
+      <div class="field-row">
+        <div class="field">
+          <label for="pdf-size">Размер страницы</label>
+          <select id="pdf-size">
+            <option value="a4">A4</option>
+            <option value="original">По размеру изображения</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pdf-orientation">Ориентация A4</label>
+          <select id="pdf-orientation">
+            <option value="portrait">Книжная</option>
+            <option value="landscape">Альбомная</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pdf-margin">Поля, мм</label>
+        <input id="pdf-margin" type="number" min="0" max="50" value="10" />
+      </div>
+      <div id="file-list"></div>
+      <p class="note">
+        Изменяйте порядок стрелками. Изображения вписываются в страницу без обрезки.
+      </p>
+      <button class="button" id="process">
+        Создать PDF
+      </button>
+      <div class="result-box" id="results"></div>
+    </>
+  )}
+  {slug === 'page-replacer' && (
+    <>
+      <Upload accept="application/pdf" hint="Добавьте один или несколько PDF · до 25 МБ на файл" />
+      <div class="note">
+        Стрелки меняют порядок, ↻ поворачивает страницу, × удаляет. Можно добавить ещё PDF, чтобы
+        вставить страницы. Защищённые PDF и документы с цифровыми подписями не поддерживаются.
+      </div>
+      <div class="field">
+        <label for="page-range">Страницы результата</label>
+        <input id="page-range" placeholder="Все или 1–3, 7, 10–12" />
+        <small>Номера относятся к текущему порядку страниц. Повторения не допускаются.</small>
+      </div>
+      <div class="actions">
+        <button class="button" id="process">
+          Сохранить выбранные страницы
+        </button>
+        <button class="button secondary" id="split-pdf">
+          Каждую страницу в ZIP
+        </button>
+        <button class="button secondary" id="clear-pages">
+          Очистить
+        </button>
+      </div>
+      <div id="page-list" class="page-grid"></div>
+      <div class="result-box" id="results"></div>
+    </>
+  )}
+  {slug === 'file-compressor' && (
+    <>
+      <div class="field">
+        <label for="compress-mode">Что сделать</label>
+        <select id="compress-mode">
+          <option value="image">Сжать изображения</option>
+          <option value="pdf">Оптимизировать PDF без растеризации</option>
+          <option value="render">Сжать PDF через изображения страниц</option>
+          <option value="zip">Упаковать любые файлы в ZIP</option>
+        </select>
+      </div>
+      <Upload hint="Изображения, PDF или любые файлы для ZIP · до 25 МБ на файл" />
+      <div id="file-list"></div>
+      <div id="image-options">
+        <div class="field-row">
+          <div class="field">
+            <label for="compress-quality">Качество JPEG / PDF, %</label>
+            <input id="compress-quality" type="number" min="10" max="100" value="80" />
+          </div>
+          <div class="field">
+            <label for="compress-width">Максимальная ширина изображения, px</label>
+            <input id="compress-width" type="number" min="100" max="12000" value="1920" />
+          </div>
+        </div>
+      </div>
+      <div class="field" id="target-field">
+        <label for="target-kb">Целевой размер изображения, КБ (необязательно)</label>
+        <input id="target-kb" type="number" min="10" max="25000" placeholder="Например, 500" />
+        <small>До 7 попыток качества. Если размер недостижим, уменьшите ширину.</small>
+      </div>
+      <div class="field" id="dpi-field" hidden>
+        <label for="pdf-dpi">Разрешение PDF, DPI</label>
+        <select id="pdf-dpi">
+          <option value="100">100 — компактно</option>
+          <option value="150" selected>
+            150 — сбалансированно
+          </option>
+          <option value="200">200 — чётче</option>
+        </select>
+      </div>
+      <p class="note" id="compress-note">
+        Результат — JPEG. Прозрачность заменяется белым фоном. Уменьшение размера не гарантируется.
+      </p>
+      <button class="button" id="process">
+        Обработать файлы
+      </button>
+      <div class="result-box" id="results"></div>
+    </>
+  )}
+  {slug === 'password' && (
+    <div class="split-workspace">
+      <div class="control-panel">
+        <div class="field">
+          <label for="password-length">
+            Длина <output id="length-value">20</output>
+          </label>
+          <input type="range" id="password-length" min="8" max="128" value="20" />
+        </div>
+        <label class="check-label">
+          <input type="checkbox" id="pw-lower" checked />
+          Строчные буквы a–z
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="pw-upper" checked />
+          Заглавные буквы A–Z
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="pw-digits" checked />
+          Цифры 0–9
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="pw-symbols" checked />
+          Символы !@#$…
+        </label>
+        <label class="check-label">
+          <input type="checkbox" id="pw-ambiguous" />
+          Исключить похожие: O0Il1
+        </label>
+        <button class="button" id="process">
+          Новый пароль
+        </button>
+        <div class="note">
+          Пароли не сохраняются. Буфер обмена управляется операционной системой; очистите его после
+          использования.
+        </div>
+      </div>
+      <div>
+        <label for="password-output">Ваш пароль</label>
+        <textarea
+          id="password-output"
+          class="password-output"
+          readonly
+          spellcheck="false"
+          autocomplete="off"
+        ></textarea>
+        <div class="strength">
+          <span id="strength-bar"></span>
+        </div>
+        <p id="password-info" class="muted"></p>
+        <div class="actions">
+          <button id="copy-password" class="button secondary">
+            Скопировать
+          </button>
+          <button id="clear-password" class="button secondary">
+            Очистить
+          </button>
+        </div>
+        <p class="note">
+          Случайность — через crypto.getRandomValues(). Если API недоступен, генерация блокируется.
+        </p>
+      </div>
+    </div>
+  )}
+  {slug === 'qr' && (
+    <div class="split-workspace">
+      <div class="control-panel">
+        <div class="field">
+          <label for="qr-type">Тип данных</label>
+          <select id="qr-type">
+            <option value="text">Текст или ссылка</option>
+            <option value="wifi">Wi-Fi</option>
+            <option value="contact">Контакт vCard</option>
+          </select>
+        </div>
+        <div id="qr-text-fields" class="field">
+          <label for="qr-text">Содержимое</label>
+          <textarea
+            id="qr-text"
+            maxlength="2000"
+            placeholder="https://example.com"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <div id="qr-wifi-fields" hidden>
+          <div class="field">
+            <label for="wifi-name">Название сети</label>
+            <input id="wifi-name" maxlength="100" />
+          </div>
+          <div class="field">
+            <label for="wifi-password">Пароль сети</label>
+            <input id="wifi-password" type="password" maxlength="128" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="wifi-security">Защита</label>
+            <select id="wifi-security">
+              <option value="WPA">WPA / WPA2 / WPA3</option>
+              <option value="WEP">WEP</option>
+              <option value="nopass">Без пароля</option>
+            </select>
+          </div>
+          <label class="check-label">
+            <input id="wifi-hidden" type="checkbox" />
+            Скрытая сеть
+          </label>
+        </div>
+        <div id="qr-contact-fields" hidden>
+          <div class="field">
+            <label for="contact-name">Имя</label>
+            <input id="contact-name" maxlength="100" />
+          </div>
+          <div class="field">
+            <label for="contact-phone">Телефон</label>
+            <input id="contact-phone" type="tel" maxlength="50" />
+          </div>
+          <div class="field">
+            <label for="contact-email">Email</label>
+            <input id="contact-email" type="email" maxlength="150" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="qr-level">Коррекция ошибок</label>
+          <select id="qr-level">
+            <option value="M">M — стандартная</option>
+            <option value="Q">Q — повышенная</option>
+            <option value="H">H — высокая</option>
+            <option value="L">L — компактная</option>
+          </select>
+        </div>
+        <button class="button" id="process">
+          Создать QR-код
+        </button>
+      </div>
+      <div>
+        <div class="qr-preview" id="qr-preview">
+          <span class="muted">Здесь появится QR-код</span>
+        </div>
+        <div class="actions">
+          <button class="button secondary" id="qr-png" disabled>
+            Скачать PNG
+          </button>
+          <button class="button secondary" id="qr-svg" disabled>
+            Скачать SVG
+          </button>
+          <button class="button secondary" id="qr-clear">
+            Очистить
+          </button>
+        </div>
+        <p class="note">
+          QR-код содержит введённые данные в читаемом виде. Не публикуйте QR с паролем Wi-Fi, если
+          сеть должна оставаться закрытой.
+        </p>
+      </div>
+    </div>
+  )}
+  <ExtraTools slug={slug} />
+</fieldset>
+<div class="actions" id="result-actions" hidden>
+  <button class="button secondary" id="zip-results">
+    Скачать результаты ZIP
+  </button>
+  <button class="button secondary" id="clear-results">
+    Очистить результаты
+  </button>
+</div>
+<button class="button secondary" id="cancel-job" hidden>
+  Остановить после текущего шага
+</button>
+<p
+  class="status"
+  id="tool-status"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+  tabindex="-1"
+></p>

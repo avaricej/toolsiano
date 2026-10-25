@@ -1,0 +1,56 @@
+(security_headers) {
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		X-Frame-Options DENY
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
+
+{$SITE_ADDRESS:localhost} {
+	root * {$SITE_ROOT:/srv}
+	encode zstd gzip
+	map {host} {default_lang} {
+		~(?i)\.com$ en
+		default ru
+	}
+	map {path} {error_lang} {
+		~^/en/ en
+		~^/ru/ ru
+		default {default_lang}
+	}
+	import security_headers
+	@assets path /_astro/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	@fresh path /sw.js /build-info.json /manifest*.webmanifest /theme.js /language.js
+	header @fresh Cache-Control "no-cache"
+	@html path / /en/* /ru/* *.html
+	header @html Cache-Control "no-cache"
+	@gone path_regexp gone ^/(?:en/|ru/|tools/)?(?:pomodoro|format|seo|diary|loto)(?:/|$)
+	respond @gone "This tool is no longer part of Toolsiano." 410
+	@errorpage path /404.html /en/404.html /ru/404.html
+	error @errorpage 404
+	@index path_regexp index ^/(.*?/)?index\.html$
+	redir @index /{re.index.1} 301
+	@root path /
+	redir @root /{default_lang}/ 302
+	@toolsroot path /tools /tools/
+	redir @toolsroot /{default_lang}/ 301
+	@compressor path /tools/compressor/ /tools/compressor
+	redir @compressor /{default_lang}/file-compressor/ 301
+	@legacy path_regexp legacy ^/(?:tools/)?(image-tools|pdf|page-replacer|file-compressor|meta-remover|password|qr|pdf-export|scan-tools|qr-reader|pdf-watermark|about|security|privacy|libraries|download)/?$
+	redir @legacy /{default_lang}/{re.legacy.1}/ 301
+	@sitemap path /sitemap.xml
+	rewrite @sitemap /sitemap-{default_lang}.xml
+	@robots path /robots.txt
+	rewrite @robots /robots-{default_lang}.txt
+	file_server
+	handle_errors {
+		import security_headers
+		rewrite * /{error_lang}/404.html
+		file_server
+	}
+}

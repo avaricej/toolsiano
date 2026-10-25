@@ -1,0 +1,12 @@
+node_modules
+dist
+.astro
+.git
+work
+test-results
+playwright-report
+.env
+.env.*
+*.log
+src-tauri/target
+src-tauri/gen

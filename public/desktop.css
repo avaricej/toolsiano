@@ -1,0 +1,210 @@
+/* Native-only layout, loaded by the desktop build transform. */
+html[data-runtime='desktop'] {
+  --sidebar: 224px;
+}
+html[data-runtime='desktop'] .sidebar {
+  width: var(--sidebar);
+  padding: 18px 12px 12px;
+  transform: none;
+  box-shadow: none;
+}
+html[data-runtime='desktop'] .app-shell {
+  margin-left: var(--sidebar);
+}
+html[data-runtime='desktop'] .brand {
+  padding: 0 8px 20px;
+  font-size: 21px;
+}
+html[data-runtime='desktop'] .nav-section {
+  display: none;
+}
+html[data-runtime='desktop'] .nav-group-label {
+  margin-top: 12px;
+  font-size: 11px;
+}
+html[data-runtime='desktop'] .nav-link {
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 38px;
+  padding: 8px 10px;
+}
+html[data-runtime='desktop'] .sidebar-bottom {
+  padding-top: 14px;
+}
+html[data-runtime='desktop'] .local-note {
+  display: none;
+}
+html[data-runtime='desktop'] .topbar {
+  height: 60px;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 25;
+}
+html[data-runtime='desktop'] .mobile-toggle {
+  display: none;
+}
+html[data-runtime='desktop'] .desktop-sidebar-toggle {
+  display: inline-grid;
+  flex-shrink: 0;
+}
+html[data-runtime='desktop'] main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px 24px;
+}
+html[data-runtime='desktop'] .tool-heading {
+  padding: 24px 0 18px;
+}
+html[data-runtime='desktop'] .tool-heading h1 {
+  font-size: 28px;
+}
+html[data-runtime='desktop'] .tool-heading > p {
+  font-size: 14px;
+  margin-top: 8px;
+}
+html[data-runtime='desktop'] .workspace {
+  padding: 22px;
+  container-type: inline-size;
+}
+html[data-runtime='desktop'] .dropzone {
+  min-height: 110px;
+  padding: 18px;
+}
+html[data-runtime='desktop'] .split-workspace {
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 22px;
+}
+html[data-runtime='desktop'] .control-panel {
+  padding-right: 20px;
+}
+html[data-runtime='desktop'] .field label,
+html[data-runtime='desktop'] .check-label,
+html[data-runtime='desktop'] label {
+  font-size: 14px;
+}
+html[data-runtime='desktop'] input,
+html[data-runtime='desktop'] select,
+html[data-runtime='desktop'] textarea,
+html[data-runtime='desktop'] .button {
+  font-size: 14px;
+}
+html[data-runtime='desktop'] .field small,
+html[data-runtime='desktop'] .note,
+html[data-runtime='desktop'] .muted {
+  font-size: 12px;
+}
+html[data-runtime='desktop'] .desktop-details {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  margin: 14px 0;
+  padding: 0 14px;
+  background: var(--surface);
+  min-width: 0;
+}
+html[data-runtime='desktop'] .desktop-details > summary {
+  padding: 13px 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+html[data-runtime='desktop'] .desktop-details[open] {
+  padding-bottom: 14px;
+}
+html[data-runtime='desktop'] .desktop-details .tool-docs {
+  display: block;
+  margin: 0;
+}
+html[data-runtime='desktop'] .tool-docs > section {
+  border: 0;
+  padding: 10px 0;
+  background: transparent;
+}
+html[data-runtime='desktop'] .desktop-details #watermark-controls {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+html[data-runtime='desktop'] .desktop-details .field:first-of-type {
+  margin-top: 8px;
+}
+html[data-runtime='desktop'] .desktop-settings-changed {
+  color: var(--accent);
+  margin-left: 8px;
+  font-size: 12px;
+}
+html[data-runtime='desktop'] .hero {
+  display: block;
+  padding: 26px 0 14px;
+}
+html[data-runtime='desktop'] .hero h1 {
+  font-size: 30px;
+  margin-bottom: 12px;
+}
+html[data-runtime='desktop'] .hero-description {
+  font-size: 15px;
+  max-width: none;
+}
+html[data-runtime='desktop'] .breadcrumb {
+  font-size: 12px;
+}
+html[data-runtime='desktop'] .footer {
+  padding: 16px 24px;
+}
+html[data-runtime='desktop'] .desktop-limit-note {
+  color: var(--muted);
+  font-size: 12px !important;
+}
+html[data-runtime='desktop'] .desktop-primary-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 0;
+  margin: 6px 0 14px;
+  position: sticky;
+  top: 70px;
+  z-index: 4;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+html.desktop-sidebar-compact {
+  --sidebar: 72px;
+}
+html.desktop-sidebar-compact .sidebar {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+html.desktop-sidebar-compact .brand {
+  padding-left: 7px;
+  padding-right: 0;
+}
+html.desktop-sidebar-compact .brand > span,
+html.desktop-sidebar-compact .desktop-nav-text,
+html.desktop-sidebar-compact .count,
+html.desktop-sidebar-compact .nav-group-label {
+  display: none;
+}
+html.desktop-sidebar-compact .nav-link {
+  justify-content: center;
+  padding: 10px;
+}
+html.desktop-sidebar-compact .nav-group {
+  margin-top: 8px;
+}
+@container (max-width: 660px) {
+  html[data-runtime='desktop'] .split-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  html[data-runtime='desktop'] .control-panel {
+    border-right: 0;
+    padding-right: 0;
+  }
+}
+@media (max-width: 950px) {
+  html[data-runtime='desktop'] main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  html[data-runtime='desktop'] .workspace {
+    padding: 16px;
+  }
+}

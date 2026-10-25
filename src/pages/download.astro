@@ -1,0 +1,180 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import data from '../data/desktop-releases.json';
+import { validateDesktopCatalog } from '../lib/desktop';
+const catalog = validateDesktopCatalog(data);
+const latest = catalog.releases[0];
+const platforms = [
+  {
+    id: 'windows',
+    name: 'Windows',
+    format: '.exe / .msi',
+    instruction: 'Запустите установщик и следуйте его инструкциям.',
+  },
+  {
+    id: 'macos',
+    name: 'macOS',
+    format: '.dmg',
+    instruction: 'Откройте DMG и перенесите Toolsiano в папку Applications.',
+  },
+  {
+    id: 'linux',
+    name: 'Linux',
+    format: '.AppImage / .deb',
+    instruction:
+      'Для AppImage разрешите запуск файла в его свойствах. DEB установите через менеджер пакетов.',
+  },
+];
+---
+
+<Layout
+  title="Скачать приложение"
+  description="Десктопная версия Toolsiano для Windows, macOS и Linux: доступность сборок, установка, проверка файлов и история версий. Русский и английский интерфейс."
+>
+  <article class="prose download-page">
+    <span class="eyebrow">TOOLSIANO DESKTOP</span>
+    <h1>Скачать Toolsiano</h1>
+    <p class="lead">
+      Инструменты для изображений, PDF, паролей и QR-кодов в отдельном приложении на вашем
+      компьютере.
+    </p>
+    {!latest && (
+      <div class="download-notice">
+        <strong>Десктопные сборки готовятся</strong>
+        <p>
+          Установщики ещё не опубликованы. Пока используйте инструменты в браузере или сохраните
+          веб-версию для работы без интернета через «Офлайн-доступ» внизу страницы.
+        </p>
+        <a class="button" href="/">
+          Открыть инструменты
+        </a>
+      </div>
+    )}
+    {latest && (
+      <p>
+        <span>Последний выпуск:</span> <strong>{latest.tag}</strong> ·{' '}
+        <time datetime={latest.date}>{latest.date.slice(0, 10)}</time>
+      </p>
+    )}
+    <p id="platform-hint" class="muted" hidden>
+      Ваша система выделена ниже. При необходимости выберите другую.
+    </p>
+    <div class="download-grid">
+      {platforms.map((platform) => {
+        const assets = latest?.assets.filter((asset) => asset.platform === platform.id) || [];
+        return (
+          <section
+            class="download-card"
+            data-platform={platform.id}
+            aria-labelledby={`title-${platform.id}`}
+          >
+            <Icon name="download" size={26} />
+            <h2 id={`title-${platform.id}`}>{platform.name}</h2>
+            <p>{platform.format}</p>
+            {assets.length ? (
+              assets.map((asset) => (
+                <div class="download-asset">
+                  <a class="button" href={asset.url} rel="noreferrer">
+                    Скачать{' '}
+                    <span>
+                      {platform.name} · {asset.architecture}
+                    </span>
+                  </a>
+                  <p>
+                    {asset.name}
+                    <br />
+                    {(asset.size / 1024 / 1024).toFixed(1)} MiB
+                  </p>
+                  <details>
+                    <summary>Контрольная сумма SHA-256</summary>
+                    <code>{asset.sha256}</code>
+                  </details>
+                </div>
+              ))
+            ) : (
+              <p class="download-status">Сборка пока недоступна</p>
+            )}
+            <details>
+              <summary>Как установить</summary>
+              <p>{platform.instruction}</p>
+            </details>
+          </section>
+        );
+      })}
+    </div>
+    <h2>Язык и работа без интернета</h2>
+    <p>
+      Для десктопной версии запланированы русский и английский интерфейс, выбор языка в настройках и
+      локальная обработка файлов. Точные системные требования и доступные архитектуры будут указаны
+      при публикации первого выпуска.
+    </p>
+    <h2>Проверка установщика</h2>
+    <p>
+      После скачивания сравните SHA-256 файла с суммой рядом с кнопкой. В Windows используйте
+      Get-FileHash, в macOS — shasum -a 256, в Linux — sha256sum. Совпадение подтверждает
+      целостность файла, но не заменяет проверку издателя и исходного кода.
+    </p>
+    <h2>История версий и исходный код</h2>
+    {catalog.repository ? (
+      <>
+        <p>
+          <a href={`https://github.com/${catalog.repository}`} rel="noreferrer">
+            Репозиторий приложения
+          </a>{' '}
+          ·{' '}
+          <a href={`https://github.com/${catalog.repository}/releases`} rel="noreferrer">
+            Все выпуски на GitHub
+          </a>
+        </p>
+        <ul>
+          {catalog.releases.map((release) => (
+            <li>
+              <a
+                href={`https://github.com/${catalog.repository}/releases/tag/${encodeURIComponent(release.tag)}`}
+                rel="noreferrer"
+              >
+                {release.tag}
+              </a>{' '}
+              · <time datetime={release.date}>{release.date.slice(0, 10)}</time>
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p>История версий и ссылка на репозиторий появятся после публикации приложения.</p>
+    )}
+    <h2>Приватность скачивания</h2>
+    <p>
+      Установщики будут распространяться через GitHub Releases. GitHub учитывает скачивания файлов;
+      повторные загрузки и обновления могут увеличивать показатель. Это не число пользователей или
+      установок.
+    </p>
+    <p>
+      Страница не отправляет события о посещениях и нажатиях. При переходе на GitHub действуют его
+      правила обработки сетевых данных.
+    </p>
+    <p>
+      <a
+        href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+        rel="noreferrer"
+      >
+        Политика приватности GitHub
+      </a>{' '}
+      · <a href="/privacy/">Политика приватности Toolsiano</a>
+    </p>
+  </article>
+  <script>
+    import { detectDesktopPlatform } from '../lib/desktop';
+    const platform = detectDesktopPlatform(
+      navigator.platform,
+      navigator.userAgent,
+      navigator.maxTouchPoints,
+    );
+    const card = platform && document.querySelector(`[data-platform="${platform}"]`);
+    if (card) {
+      card.classList.add('recommended-platform');
+      document.getElementById('platform-hint')!.hidden = false;
+    }
+  </script>
+</Layout>
