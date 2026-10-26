@@ -25,8 +25,14 @@ export function simplifyDesktop(document, architecture = 'x64') {
   const slug = document.querySelector('[data-tool]')?.dataset.tool;
   if (slug === 'image-tools') {
     disclosure(
-      ['image-rotate', 'image-crop', 'image-filter'].map(field),
-      en ? 'Rotate, crop and filters' : 'Поворот, обрезка и фильтры',
+      [
+        'image-rotate',
+        'image-crop',
+        'image-filter',
+        'image-background',
+        'image-background-color',
+      ].map(field),
+      en ? 'Rotate, crop, filters and background' : 'Поворот, обрезка, фильтры и фон',
     );
     const watermark = document.getElementById('watermark-controls');
     if (watermark) {

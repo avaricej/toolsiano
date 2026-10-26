@@ -43,6 +43,9 @@ export function beginJob() {
 export function cancelJob() {
   cancelled = true;
 }
+export function isJobCancelled() {
+  return cancelled;
+}
 export async function yieldUI() {
   await new Promise<void>((r) => setTimeout(r, 0));
   if (cancelled) throw new Error(t('Обработка остановлена. Готовые результаты сохранены.'));

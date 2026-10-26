@@ -4,12 +4,13 @@ export const tools = [
     slug: 'image-tools',
     name: 'Редактор изображений',
     short: 'Изображения',
-    description: 'Пакетная конвертация, размер, обрезка, поворот и водяные знаки.',
+    description:
+      'Конвертируйте JPG, PNG, WebP, AVIF и SVG, меняйте размер и добавляйте водяные знаки.',
     category: 'Изображения',
     icon: 'image',
     color: 'purple',
-    tag: 'JPG · PNG · WebP',
-    libraries: ['pica'],
+    tag: 'JPG · PNG · WebP · AVIF · SVG',
+    libraries: ['pica', '@jsquash/avif'],
     featured: true,
   },
   {

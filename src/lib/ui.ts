@@ -259,14 +259,18 @@ export function fileList(files: File[], onChange: () => void) {
     list.append(row);
   });
 }
-export async function loadImage(file: Blob) {
-  const dimensions = await imageDimensions(file);
+export async function loadImage(file: Blob, extended = false) {
+  const prepared = extended
+    ? await (await import('./editor-input.ts')).prepareEditorImage(file)
+    : null;
+  const source = prepared?.blob || file;
+  const dimensions = prepared?.dimensions || (await imageDimensions(source));
   if (
     dimensions &&
     (Math.max(...dimensions) > MAX_SIDE || dimensions[0] * dimensions[1] > limits().pixels)
   )
     throw new Error(t('Изображение слишком большое для безопасной обработки на этом устройстве'));
-  const url = objectURL(file);
+  const url = objectURL(source);
   try {
     const image = new Image();
     image.src = url;
@@ -279,6 +283,16 @@ export async function loadImage(file: Blob) {
     return image;
   } catch (e) {
     if (e instanceof Error && e.message.includes(t('безопасной'))) throw e;
+    if (prepared?.kind === 'avif')
+      throw new Error(
+        t(
+          'Не удалось открыть AVIF. Файл повреждён или этот браузер не поддерживает его декодирование.',
+        ),
+      );
+    if (prepared?.kind === 'svg')
+      throw new Error(
+        t('Не удалось отрисовать SVG. Проверьте его структуру и используемые возможности.'),
+      );
     throw new Error(t('Не удалось прочитать изображение. Поддерживаются JPG, PNG и WebP.'));
   } finally {
     revoke(url);

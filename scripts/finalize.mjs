@@ -66,6 +66,9 @@ for (const [location, info] of Object.entries(lock.packages)) {
       licenses += `\n--- ${name} ---\n${await readFile(path.join(folder, name), 'utf8')}\n`;
   }
 }
+for (const file of (await walk(path.join(root, 'src/licenses/avif'))).sort()) {
+  licenses += `\n\n===== AVIF bundled component: ${path.basename(file)} =====\n${await readFile(file, 'utf8')}\n`;
+}
 await writeFile(path.join(dist, 'third-party-licenses.txt'), licenses);
 const files = await walk(dist);
 const hashes = {};

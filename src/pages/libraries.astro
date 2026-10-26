@@ -1,7 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { readFileSync } from 'node:fs';
-const names = ['astro', 'pdf-lib', 'pdfjs-dist', 'qrcode', 'pica', 'exifr', 'jszip', 'jsqr'];
+const names = [
+  'astro',
+  'pdf-lib',
+  'pdfjs-dist',
+  'qrcode',
+  'pica',
+  'exifr',
+  'jszip',
+  'jsqr',
+  '@jsquash/avif',
+];
 const packages = names.map((name) => {
   const p = JSON.parse(readFileSync(`${process.cwd()}/node_modules/${name}/package.json`, 'utf8'));
   return {
@@ -20,6 +30,7 @@ const uses: Record<string, string> = {
   exifr: 'Чтение метаданных',
   jszip: 'Создание ZIP-архивов',
   jsqr: 'Чтение QR-кодов из изображений',
+  '@jsquash/avif': 'Локальное кодирование AVIF (WebAssembly / libavif)',
 };
 ---
 
@@ -79,8 +90,9 @@ const uses: Record<string, string> = {
       </a>
     </p>
     <p>
-      Ссылка на GitHub появится после переноса в ваш репозиторий. До этого исходники доступны в
-      архиве: мы не подставляем ссылку на несуществующий репозиторий.
+      <a href="https://github.com/avaricej/toolsiano" target="_blank" rel="noopener noreferrer">
+        Репозиторий проекта на GitHub
+      </a>
     </p>
     <h2>Как устроена поставка</h2>
     <p>

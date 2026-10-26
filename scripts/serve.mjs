@@ -3,10 +3,10 @@ import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { routeRequest, defaultLanguage } from './routing.mjs';
-const root = path.resolve('dist');
+const root = path.resolve(process.env.TOOLSIANO_DIST || 'dist');
 const port = Number(process.env.PORT || 4321);
 const csp =
-  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
 const types = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -19,6 +19,7 @@ const types = {
   '.zip': 'application/zip',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml',
+  '.wasm': 'application/wasm',
 };
 createServer(async (req, res) => {
   res.setHeader('Content-Security-Policy', csp);

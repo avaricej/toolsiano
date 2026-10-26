@@ -19,12 +19,26 @@ import {
 import { canvas, validateBatch, yieldUI } from '../../lib/resources.ts';
 import { stripJpeg, stripPng } from '../../lib/image-processing.ts';
 import { initWatermark, drawMark } from '../../lib/watermark.ts';
-import { fallbackFilter, whiteBackground } from '../../lib/canvas-filters.ts';
+import { fallbackFilter } from '../../lib/canvas-filters.ts';
+import { editorImageKind } from '../../lib/editor-input.ts';
+import { exportImage, validateAvifSize } from '../../lib/image-export.ts';
 export function init(slug: string) {
   let files: File[] = [];
   let original: HTMLCanvasElement | null = null;
   let edited: HTMLCanvasElement | null = null;
   const watermark = slug === 'image-tools' ? initWatermark(() => updatePreview()) : undefined;
+  function background(c: HTMLCanvasElement) {
+    const custom = value('image-background') === 'color';
+    if (!custom && value('image-format') !== 'image/jpeg') return;
+    const color = custom ? value('image-background-color') : '#ffffff';
+    if (!/^#[0-9a-f]{6}$/i.test(color)) throw new Error(t('Выберите корректный цвет фона.'));
+    const ctx = c.getContext('2d')!;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.restore();
+  }
   function updatePreview() {
     if (!original || !watermark) return;
     try {
@@ -70,7 +84,7 @@ export function init(slug: string) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       if (nativeFilter) ctx.filter = 'none';
       else fallbackFilter(c, value('image-filter'));
-      if (value('image-format') === 'image/jpeg') whiteBackground(c);
+      background(c);
       try {
         const mark = watermark.prepare();
         if (mark) drawMark(c, mark, watermark.options());
@@ -102,7 +116,7 @@ export function init(slug: string) {
     if (slug === 'image-tools') $('compare-control').hidden = true;
     if (!files.length) return;
     const firstFile = files[0];
-    const image = await loadImage(firstFile);
+    const image = await loadImage(firstFile, slug === 'image-tools');
     if (version !== previewVersion || files[0] !== firstFile) return;
     const preview = canvas(
       Math.max(
@@ -158,7 +172,9 @@ export function init(slug: string) {
   }
   upload('files', async (incoming) => {
     validateBatch(incoming);
-    if (incoming.some((f) => !['image/jpeg', 'image/png', 'image/webp'].includes(f.type)))
+    if (slug === 'image-tools') {
+      for (const file of incoming) await editorImageKind(file);
+    } else if (incoming.some((f) => !['image/jpeg', 'image/png', 'image/webp'].includes(f.type)))
       throw new Error(t('Поддерживаются только JPG, PNG и WebP'));
     clearResults();
     files = incoming;
@@ -167,6 +183,27 @@ export function init(slug: string) {
     status(t(`Выбрано файлов: ${files.length}`));
   });
   if (slug === 'image-tools') {
+    const formatNote = () => {
+      const format = value('image-format');
+      $('image-format-note').textContent =
+        format === 'image/avif'
+          ? t(
+              'AVIF кодируется локально. До 4 Мп; на узком экране и в x86 — до 2 Мп. Обработка может занять больше времени.',
+            )
+          : format === 'image/svg+xml'
+            ? t(
+                'SVG содержит встроенное PNG-изображение. Это не векторизация: при увеличении сохраняется растровая детализация. Файл может стать больше.',
+              )
+            : '';
+      const quality = $<HTMLInputElement>('image-quality');
+      quality.disabled = ['image/png', 'image/svg+xml'].includes(format);
+    };
+    $('image-format').addEventListener('change', formatNote);
+    formatNote();
+    $('image-background').addEventListener('change', () => {
+      $('image-background-color-field').hidden = value('image-background') !== 'color';
+      updatePreview();
+    });
     document.querySelector('.control-panel')!.addEventListener('input', (e) => {
       if (!(e.target as HTMLElement).closest('#watermark-controls')) updatePreview();
     });
@@ -222,7 +259,7 @@ export function init(slug: string) {
           done++;
           continue;
         }
-        const image = await loadImage(f);
+        const image = await loadImage(f, true);
         let sw = image.naturalWidth,
           sh = image.naturalHeight,
           sx = 0,
@@ -248,10 +285,16 @@ export function init(slug: string) {
           if (iw) h = Math.round((w * sh) / sw);
           else if (ih) w = Math.round((h * sw) / sh);
         }
-        const base = canvas(sw, sh),
-          resized = canvas(w, h);
-        base.getContext('2d')!.drawImage(image, sx, sy, sw, sh, 0, 0, base.width, base.height);
-        await resizer.resize(base, resized);
+        if (value('image-format') === 'image/avif') validateAvifSize(w, h);
+        const resized = canvas(w, h);
+        let base: HTMLCanvasElement | null = null;
+        if ((await editorImageKind(f)) === 'svg') {
+          resized.getContext('2d')!.drawImage(image, sx, sy, sw, sh, 0, 0, w, h);
+        } else {
+          base = canvas(sw, sh);
+          base.getContext('2d')!.drawImage(image, sx, sy, sw, sh, 0, 0, base.width, base.height);
+          await resizer.resize(base, resized);
+        }
         const rotation = Number(value('image-rotate'));
         const out = canvas(rotation % 180 ? h : w, rotation % 180 ? w : h);
         const ctx = out.getContext('2d')!;
@@ -264,11 +307,18 @@ export function init(slug: string) {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         if (nativeFilter) ctx.filter = 'none';
         else fallbackFilter(out, value('image-filter'));
-        if (type === 'image/jpeg') whiteBackground(out);
+        background(out);
         if (mark && markOptions) drawMark(out, mark, markOptions);
-        const blob = await toBlob(out, type, number('image-quality', 10, 100) / 100);
-        const ext =
-          blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/webp' ? 'webp' : 'png';
+        if (type === 'image/avif') status(t('Кодируем AVIF на вашем устройстве…'));
+        const blob = await exportImage(out, type, number('image-quality', 10, 100) / 100);
+        const extensions: Record<string, string> = {
+          'image/jpeg': 'jpg',
+          'image/png': 'png',
+          'image/webp': 'webp',
+          'image/avif': 'avif',
+          'image/svg+xml': 'svg',
+        };
+        const ext = extensions[blob.type];
         result(
           blob,
           f.name.replace(/\.[^.]+$/, '') + '-edited.' + ext,
@@ -282,7 +332,8 @@ export function init(slug: string) {
           $('compare-control').hidden = false;
           $<HTMLInputElement>('image-compare').checked = false;
         }
-        base.width = base.height = resized.width = resized.height = out.width = out.height = 0;
+        if (base) base.width = base.height = 0;
+        resized.width = resized.height = out.width = out.height = 0;
         done++;
       } catch (e) {
         errors.push(f.name + ': ' + (e instanceof Error ? e.message : t('Ошибка обработки')));
