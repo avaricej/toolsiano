@@ -1,5 +1,6 @@
 import messages from '../i18n/en.json' with { type: 'json' };
 import support from '../data/support.json' with { type: 'json' };
+import changelog from '../data/changelog.json' with { type: 'json' };
 export type Locale = 'ru' | 'en';
 export function locale(): Locale {
   return typeof document !== 'undefined' && document.documentElement.lang === 'en' ? 'en' : 'ru';
@@ -7,6 +8,9 @@ export function locale(): Locale {
 const dictionary: Record<string, string> = {
   ...messages,
   ...Object.fromEntries(Object.values(support.text).map(({ ru, en }) => [ru, en])),
+  ...Object.fromEntries(
+    changelog.flatMap((release) => release.changes.map(({ ru, en }) => [ru, en])),
+  ),
 };
 const normalize = (s: string) => s.replace(/\s+/g, ' ').trim();
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

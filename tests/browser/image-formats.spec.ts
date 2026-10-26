@@ -4,6 +4,40 @@ import { isApplicationRequest } from './environment';
 
 const svg =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20"><style>.green{fill:#00ff00}</style><rect class="green" width="20" height="20"/></svg>';
+
+test('software AVIF decoder works offline when native image decoding is unavailable', async ({ page, context }) => {
+  await page.addInitScript(() => {
+    const types = new Map<string, string>();
+    const create = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = object => {
+      const url = create(object);
+      if (object instanceof Blob) types.set(url, object.type);
+      return url;
+    };
+    const decode = HTMLImageElement.prototype.decode;
+    HTMLImageElement.prototype.decode = async function () {
+      if (types.get(this.src) === 'image/avif')
+        throw new DOMException('No native AVIF decoder', 'EncodingError');
+      return decode.call(this);
+    };
+  });
+  await visit(page);
+  await page.locator('#offline-install').click();
+  await page.locator('#offline-save').click();
+  await expect(page.locator('#offline-state')).toContainText('saved in this browser', { timeout: 60000 });
+  await page.locator('#offline-close').click();
+  await context.setOffline(true);
+  await visit(page);
+  await page.locator('#files').setInputFiles('tests/fixtures/editor-sample.avif');
+  await expect(page.locator('#image-preview canvas')).toBeVisible();
+  await page.locator('#image-format').selectOption('image/png');
+  await page.locator('#process').click();
+  const output = await download(page);
+  const decoded = await inspect(page, output.bytes, 'image/png', 10, 10);
+  expect([decoded.width, decoded.height]).toEqual([80, 60]);
+  expect(decoded.pixel[0]).toBeGreaterThan(180);
+  await context.setOffline(false);
+});
 async function visit(page: Page, lang = 'en') {
   await page.goto('/' + lang + '/image-tools/');
   await expect(page.locator('[data-tool]')).toHaveAttribute('data-ready', 'true');

@@ -1,4 +1,6 @@
 /* Native-only layout, loaded by the desktop build transform. */
+html[data-runtime='desktop'] section.desktop-only { display: block; }
+html[data-runtime='desktop'] a.desktop-only { display: flex; }
 html[data-runtime='desktop'] {
   --sidebar: 224px;
 }

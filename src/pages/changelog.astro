@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import changelog from '../data/changelog.json';
+import packageInfo from '../../package.json';
+---
+
+<Layout
+  title="История версий"
+  description="История изменений Toolsiano: новые возможности, улучшения обработки изображений и PDF, настройки языка, темы и офлайн-приложения."
+>
+  <article class="prose">
+    <h1>История версий</h1>
+    <p class="lead">Что изменилось в веб-версии и приложении Toolsiano.</p>
+    <p>
+      Здесь описаны подготовленные версии проекта. Доступность установщиков указана на странице
+      скачивания; запись в истории не означает публикацию установщика.
+    </p>
+    <p>
+      <a href="/download/">Скачать приложение</a> ·{' '}
+      <a href="https://github.com/avaricej/toolsiano" target="_blank" rel="noopener noreferrer">
+        Репозиторий проекта на GitHub
+      </a>
+    </p>
+    {changelog.map((release) => (
+      <section
+        class="version-entry"
+        id={`v${release.version}`}
+        aria-labelledby={`version-${release.version}`}
+      >
+        <h2 id={`version-${release.version}`}>
+          Версия <span>{release.version}</span>
+        </h2>
+        <p class="muted">
+          <time datetime={release.date}>{release.date}</time>
+          {release.version === packageInfo.version && (
+            <>
+              {' '}
+              · <strong>Текущая версия</strong>
+            </>
+          )}
+        </p>
+        <ul>
+          {release.changes.map((change) => (
+            <li>{change.ru}</li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </article>
+</Layout>
+<style>
+  .version-entry {
+    border-top: 1px solid var(--border);
+    margin-top: 28px;
+    padding-top: 8px;
+    scroll-margin-top: 90px;
+  }
+  .version-entry h2 {
+    margin-bottom: 8px;
+  }
+</style>

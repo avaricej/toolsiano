@@ -1,6 +1,12 @@
 import { initOffline } from './offline.ts';
 import { t } from '../lib/i18n.ts';
 import { isDesktop } from '../lib/runtime.ts';
+import { bugReportUrl } from '../lib/feedback.ts';
+import { locale } from '../lib/i18n.ts';
+document.querySelectorAll<HTMLAnchorElement>('a[data-bug-report]').forEach(anchor => {
+  anchor.href = bugReportUrl(anchor.dataset.version || '',
+    document.querySelector<HTMLElement>('[data-tool]')?.dataset.tool, locale(), isDesktop());
+});
 const toast = document.getElementById('toast')!;
 let toastTimer: ReturnType<typeof setTimeout>;
 export function notify(message: string) {

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import support from '../data/support.json';
+import packageInfo from '../../package.json';
 ---
 
 <Layout
@@ -44,11 +45,26 @@ import support from '../data/support.json';
     )}
     <h2>Обратная связь</h2>
     <p>
-      <a href="mailto:to@bxstudio.ru">to@bxstudio.ru</a>
+      <a class="button secondary" href="mailto:anak.devel@gmail.com" data-bug-report data-version={packageInfo.version}>
+        Сообщить об ошибке
+      </a>
+    </p>
+    <p>
+      Откроется черновик письма с версией приложения и названием инструмента. Файлы, введённые данные и журналы не прикрепляются. Письмо отправляете вы.
+    </p>
+    <p>
+      <a href="mailto:anak.devel@gmail.com">anak.devel@gmail.com</a>
     </p>
     <p>
       Не прикладывайте личные документы и пароли. Для сообщения об ошибке используйте обезличенный
       пример.
     </p>
+    <section class="desktop-only" id="app-updates">
+      <h2>Обновления приложения</h2>
+      <p>Установленная версия: <strong>{packageInfo.version}</strong></p>
+      <p>Обновления устанавливаются вручную. Откройте страницу скачивания, сравните версии и загрузите подходящий установщик. Проверок обновлений в фоне нет.</p>
+      <p><a class="button" href="/download/" data-updates-download>Открыть страницу скачивания</a></p>
+      <p><a href="https://github.com/avaricej/toolsiano/releases" target="_blank" rel="noopener noreferrer">Выпуски на GitHub</a> · <a href="/changelog/">История версий</a></p>
+    </section>
   </article>
 </Layout>

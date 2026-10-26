@@ -283,12 +283,16 @@ export async function loadImage(file: Blob, extended = false) {
     return image;
   } catch (e) {
     if (e instanceof Error && e.message.includes(t('безопасной'))) throw e;
-    if (prepared?.kind === 'avif')
-      throw new Error(
-        t(
-          'Не удалось открыть AVIF. Файл повреждён или этот браузер не поддерживает его декодирование.',
-        ),
-      );
+    if (prepared?.kind === 'avif') {
+      const { decodeAvif } = await import('./avif-decode.ts');
+      const pixels = await decodeAvif(source, dimensions);
+      const c = document.createElement('canvas');
+      c.width = dimensions![0]; c.height = dimensions![1];
+      try {
+        c.getContext('2d')!.putImageData(new ImageData(new Uint8ClampedArray(pixels), c.width, c.height), 0, 0);
+        return await loadImage(await toBlob(c));
+      } finally { c.width = c.height = 0; }
+    }
     if (prepared?.kind === 'svg')
       throw new Error(
         t('Не удалось отрисовать SVG. Проверьте его структуру и используемые возможности.'),

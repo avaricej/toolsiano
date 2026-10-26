@@ -1,6 +1,6 @@
 # AVIF codec notices
 
-Toolsiano uses the unmodified single-thread encoder shipped in `@jsquash/avif` 2.1.1 (Apache-2.0; its root LICENSE is collected from the npm package).
+Toolsiano uses the unmodified single-thread encoder and decoder shipped in `@jsquash/avif` 2.1.1 (Apache-2.0; its root LICENSE is collected from the npm package). The decoder uses libavif/libaom from the same build recipe and is loaded only when native browser AVIF decoding fails.
 
 Package source commit: b7fa9ac9ec02f224847ad23d19d115f9e296a368.
 The upstream build recipe identifies these bundled components:

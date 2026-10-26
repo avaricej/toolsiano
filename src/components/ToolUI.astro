@@ -48,6 +48,7 @@ const { slug } = Astro.props;
                 </select>
               </div>
               <p id="image-format-note" class="note" aria-live="polite"></p>
+              <small>Если браузер не открывает AVIF самостоятельно, используется локальный декодер: до 4 Мп, на узком экране и в x86 — до 2 Мп. HDR и цветовые профили могут измениться.</small>
               <div class="field">
                 <label for="image-quality">
                   Качество <output id="quality-value">85%</output>

@@ -3895,7 +3895,7 @@ checksum = "06bdbd8cfc056b8d2e2e85f29b56a3bdbecb527cef81eb39e3e7b98af4652770"
 
 [[package]]
 name = "toolsiano-desktop"
-version = "1.0.3"
+version = "1.0.5"
 dependencies = [
  "tauri",
  "tauri-build",

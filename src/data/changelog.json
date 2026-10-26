@@ -1,0 +1,110 @@
+[
+  {
+    "version": "1.0.5",
+    "date": "2026-10-26",
+    "changes": [
+      {
+        "ru": "Добавлено локальное открытие AVIF через WebAssembly в браузерах без встроенного декодера: до 4 Мп, на узком экране и в x86 — до 2 Мп. Декодер включён в офлайн-копию.",
+        "en": "Added local WebAssembly AVIF decoding for browsers without a native decoder: up to 4 MP, or 2 MP on narrow screens and in x86. The decoder is included offline."
+      },
+      {
+        "ru": "Добавлена ссылка «Сообщить об ошибке»: черновик письма содержит только версию, название инструмента и тип приложения, без файлов, журналов и содержимого полей.",
+        "en": "Added Report a bug: the email draft contains only the version, tool name and app type, without files, logs or input contents."
+      },
+      {
+        "ru": "В десктопе добавлен раздел ручного обновления с установленной версией и ссылками на скачивание и выпуски GitHub. Фоновых проверок нет.",
+        "en": "Added a manual update section in the desktop app with the installed version and links to downloads and GitHub releases. No background checks."
+      }
+    ]
+  },
+  {
+    "version": "1.0.4",
+    "date": "2026-10-26",
+    "changes": [
+      {
+        "ru": "Исправлена обработка PDF со стандартными шрифтами, CMap и изображениями JPEG 2000 / JBIG2: необходимые ресурсы включены в сайт, офлайн-копию и десктопное приложение.",
+        "en": "Fixed PDF rendering with standard fonts, CMaps and JPEG 2000 / JBIG2 images: required resources are bundled with the website, offline copy and desktop app."
+      },
+      {
+        "ru": "Дополнены лицензионные уведомления встроенных компонентов PDF.js. Исправлены контакты и инструкции приватности в десктопе, перенаправления истории версий. Скрыто пустое пояснение формата изображения.",
+        "en": "Added license notices for bundled PDF.js components. Fixed desktop privacy contacts and instructions, and version history redirects. Hidden the empty image format note."
+      }
+    ]
+  },
+  {
+    "version": "1.0.3",
+    "date": "2026-10-26",
+    "changes": [
+      {
+        "ru": "Добавлен экспорт в AVIF с настройкой качества и сохранением прозрачности. Кодирование выполняется локально в отдельном рабочем потоке.",
+        "en": "Added AVIF export with quality control and transparency. Encoding runs locally in a dedicated worker."
+      },
+      {
+        "ru": "Добавлен экспорт SVG со встроенным PNG и повторное открытие таких файлов. Это сохранение растрового изображения внутри SVG, без векторизации.",
+        "en": "Added SVG export with an embedded PNG and support for reopening these files. The SVG contains a raster image without vectorization."
+      },
+      {
+        "ru": "Для экспорта AVIF введены отмена, тайм-аут и лимиты: 4 Мп, на узком экране и в x86 — 2 Мп. Кодировщик включён в офлайн-копию и приложение.",
+        "en": "AVIF export has cancellation, a timeout and limits of 4 MP, or 2 MP on narrow screens and in x86. The codec is included in the offline copy and desktop app."
+      },
+      {
+        "ru": "Обновлены пояснения форматов и лицензионные уведомления компонентов кодировщика.",
+        "en": "Updated format descriptions and license notices for the encoder components."
+      }
+    ]
+  },
+  {
+    "version": "1.0.2",
+    "date": "2026-10-26",
+    "changes": [
+      {
+        "ru": "Редактор изображений научился открывать статические AVIF и SVG и преобразовывать их в JPG, PNG и WebP.",
+        "en": "The image editor can open static AVIF and SVG files and convert them to JPG, PNG and WebP."
+      },
+      {
+        "ru": "Добавлен выбор цвета фона результата с сохранением прозрачности в PNG и WebP.",
+        "en": "Added an output background color option, with transparency support in PNG and WebP."
+      },
+      {
+        "ru": "Добавлены проверка размеров AVIF до декодирования и ограниченная обработка статических SVG без скриптов и внешних ресурсов.",
+        "en": "Added AVIF dimension checks before decoding and restricted static SVG processing without scripts or external resources."
+      }
+    ]
+  },
+  {
+    "version": "1.0.1",
+    "date": "2026-10-26",
+    "changes": [
+      {
+        "ru": "При первом запуске Windows-приложения учитывается язык установщика. Сохранённый выбор языка в приложении имеет приоритет.",
+        "en": "The Windows app uses the installer language on first launch. A saved in-app language preference takes priority."
+      },
+      {
+        "ru": "Добавлены темы «Как в системе», «Светлая» и «Тёмная». Системная тема меняется без перезапуска; ручной выбор сохраняется.",
+        "en": "Added System default, Light and Dark themes. System changes apply without restarting; manual preferences are saved."
+      },
+      {
+        "ru": "В приложение включены обновлённая подпись под логотипом и окно добровольной поддержки проекта.",
+        "en": "The desktop app includes the updated brand tagline and optional project support dialog."
+      }
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-10-25",
+    "changes": [
+      {
+        "ru": "Подготовлена новая версия Toolsiano с 11 инструментами для изображений, PDF, паролей и QR-кодов, русским и английским интерфейсом.",
+        "en": "Prepared the new Toolsiano with 11 image, PDF, password and QR tools, with Russian and English interfaces."
+      },
+      {
+        "ru": "Реализованы локальная обработка файлов, офлайн-копия веб-версии, страницы библиотек, исходного кода и приватности.",
+        "en": "Implemented local file processing, an offline web copy, and pages for libraries, source code and privacy."
+      },
+      {
+        "ru": "Собраны Windows-приложения x64 и x86 с упрощённым интерфейсом, логотипом Toolsiano и установщиком на двух языках.",
+        "en": "Built Windows x64 and x86 apps with a simplified interface, Toolsiano branding and a bilingual installer."
+      }
+    ]
+  }
+]

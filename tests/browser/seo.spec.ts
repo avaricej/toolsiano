@@ -10,6 +10,7 @@ const routes = [
   'privacy/',
   'libraries/',
   'download/',
+  'changelog/',
 ];
 test('all indexable pages have unique metadata, static content and reciprocal language links', async ({
   request,
@@ -114,6 +115,8 @@ test('domain sitemaps, redirects and direct error URLs expose correct HTTP statu
     expect(root.headers().location).toBe('/' + lang + '/');
     for (const [path, status, location] of [
       ['/pdf/', 301, '/' + lang + '/pdf/'],
+      ['/changelog/', 301, '/' + lang + '/changelog/'],
+      ['/en/changelog', 308, '/en/changelog/'],
       ['/tools/compressor/', 301, '/' + lang + '/file-compressor/'],
       ['/en/pdf/index.html', 301, '/en/pdf/'],
       ['/ru/index.html', 301, '/ru/'],

@@ -41,7 +41,7 @@
 	redir @toolsroot /{default_lang}/ 301
 	@compressor path /tools/compressor/ /tools/compressor
 	redir @compressor /{default_lang}/file-compressor/ 301
-	@legacy path_regexp legacy ^/(?:tools/)?(image-tools|pdf|page-replacer|file-compressor|meta-remover|password|qr|pdf-export|scan-tools|qr-reader|pdf-watermark|about|security|privacy|libraries|download)/?$
+	@legacy path_regexp legacy ^/(?:tools/)?(image-tools|pdf|page-replacer|file-compressor|meta-remover|password|qr|pdf-export|scan-tools|qr-reader|pdf-watermark|about|security|privacy|libraries|download|changelog)/?$
 	redir @legacy /{default_lang}/{re.legacy.1}/ 301
 	@sitemap path /sitemap.xml
 	rewrite @sitemap /sitemap-{default_lang}.xml

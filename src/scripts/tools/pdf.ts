@@ -28,6 +28,19 @@ export async function pdfjs() {
     return lib;
   })());
 }
+// Every renderer uses the same local resources, including offline and native builds.
+export async function renderPdf(data: Uint8Array) {
+  const lib = await pdfjs();
+  return lib.getDocument({
+    data,
+    cMapUrl: '/pdfjs/cmaps/',
+    standardFontDataUrl: '/pdfjs/standard_fonts/',
+    wasmUrl: '/pdfjs/wasm/',
+    iccUrl: '/pdfjs/iccs/',
+    useSystemFonts: false,
+    enableXfa: false,
+  });
+}
 export async function openPdf(bytes: ArrayBuffer) {
   try {
     const doc = await PDFDocument.load(bytes, { updateMetadata: false });
@@ -251,8 +264,7 @@ function compressor() {
   });
 }
 async function rasterPdf(bytes: ArrayBuffer, dpi: number, quality: number) {
-  const lib = await pdfjs();
-  const loadingTask = lib.getDocument({ data: new Uint8Array(bytes.slice(0)) });
+  const loadingTask = await renderPdf(new Uint8Array(bytes.slice(0)));
   const input = await loadingTask.promise;
   try {
     const out = await PDFDocument.create();

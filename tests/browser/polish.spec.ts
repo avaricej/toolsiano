@@ -136,25 +136,31 @@ test('mobile menu, upload and processing keep a visible keyboard focus and annou
   await expect(page.locator('#tool-status')).toHaveAttribute('role', 'alert');
   await expect(page.locator('#process')).toBeFocused();
   for (const theme of ['light', 'dark']) {
-    await page.evaluate((theme) => {
-      document.documentElement.dataset.theme = theme;
-    }, theme);
+    await page.getByRole('combobox', { name: 'Color theme' }).selectOption(theme);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
     const contrast = await page.locator('#tool-status').evaluate((el) => {
-      const luminance = (color: string) => {
+      const luminance = (colors: string[]) => {
         // WebKit may serialize a computed color as color(srgb ...) rather than rgb(...).
         const sample = document.createElement('canvas');
         sample.width = sample.height = 1;
         const ctx = sample.getContext('2d')!;
-        ctx.fillStyle = color;
+        ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, 1, 1);
+        for (const color of colors) {
+          ctx.fillStyle = color;
+          ctx.fillRect(0, 0, 1, 1);
+        }
         const c = [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3).map((n) => {
           n /= 255;
           return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
         });
         return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
       };
-      const fg = luminance(getComputedStyle(el).color),
-        bg = luminance(getComputedStyle(document.querySelector('.workspace')!).backgroundColor);
+      // Composite transparent backgrounds instead of treating transparent black as black.
+      const ancestors: Element[] = [];
+      for (let node: Element | null = el; node; node = node.parentElement) ancestors.push(node);
+      const fg = luminance([getComputedStyle(el).color]),
+        bg = luminance(ancestors.reverse().map(node => getComputedStyle(node).backgroundColor));
       return (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);
     });
     expect(contrast).toBeGreaterThanOrEqual(4.5);

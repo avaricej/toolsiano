@@ -65,14 +65,14 @@ export async function init(slug: string) {
     });
     action('mark-preview-button', async () => {
       if (!file) throw new Error(t('Сначала выберите файл'));
-      const { openPdf, pdfjs } = await import('./pdf.ts');
+      const { openPdf, renderPdf } = await import('./pdf.ts');
       const bytes = await file.arrayBuffer();
       const checkedDoc = await openPdf(bytes);
       previewCount = checkedDoc.getPageCount();
       previewPage = pageRange(value('mark-range'), previewCount)[0] + 1;
       watermark!.prepare(previewPage, previewCount);
       watermark!.options();
-      const task = (await pdfjs()).getDocument({ data: new Uint8Array(bytes) });
+      const task = await renderPdf(new Uint8Array(bytes));
       try {
         const doc = await task.promise,
           page = await doc.getPage(previewPage);
@@ -164,7 +164,7 @@ export async function init(slug: string) {
       status(t('Скан подготовлен. Проверьте читаемость и края.'));
       return;
     }
-    const { openPdf, pdfjs } = await import('./pdf.ts');
+    const { openPdf, renderPdf } = await import('./pdf.ts');
     const bytes = await file.arrayBuffer();
     if (slug === 'pdf-watermark') {
       const { watermarkPage } = await import('../../lib/pdf-watermark.ts');
@@ -187,8 +187,7 @@ export async function init(slug: string) {
       status(t('Водяной знак добавлен. Исходный файл не изменён.'));
       return;
     }
-    const lib = await pdfjs();
-    const task = lib.getDocument({ data: new Uint8Array(bytes) });
+    const task = await renderPdf(new Uint8Array(bytes));
     try {
       const doc = await task.promise;
       if (doc.numPages > limits().pages)

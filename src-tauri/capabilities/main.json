@@ -8,7 +8,7 @@
     "fs:allow-write-file",
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "https://*" }, { "url": "mailto:to@bxstudio.ru" }]
+      "allow": [{ "url": "https://*" }, { "url": "mailto:anak.devel@gmail.com" }, { "url": "mailto:anak.devel@gmail.com[?]subject=*" }]
     }
   ]
 }

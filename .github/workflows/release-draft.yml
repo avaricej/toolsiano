@@ -1,0 +1,80 @@
+name: Prepare Windows release draft
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-release-draft
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check && npm test && npm run build
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run test:e2e
+  windows:
+    needs: verify
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, x86]
+        include:
+          - architecture: x64
+            target: x86_64-pc-windows-msvc
+          - architecture: x86
+            target: i686-pc-windows-msvc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: rustup toolchain install stable --profile minimal
+      - run: rustup target add ${{ matrix.target }}
+      - run: npm ci --ignore-scripts
+      - run: npm run desktop:build -- --target ${{ matrix.target }} --bundles nsis -- --locked
+      - run: node scripts/package-desktop.mjs --architecture ${{ matrix.architecture }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-windows-${{ matrix.architecture }}
+          path: work/desktop-packages
+          retention-days: 14
+  draft:
+    needs: windows
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-windows-*
+          path: work/release-assets
+          merge-multiple: true
+      - run: node scripts/prepare-release.mjs work/release-assets
+      - name: Create draft for owner review
+        shell: bash
+        run: |
+          tag="v$(node -p 'require("./package.json").version')"
+          gh release create "$tag" --draft --target "$GITHUB_SHA" --title "Toolsiano $tag" --notes-file work/release-assets/RELEASE_NOTES.md work/release-assets/Toolsiano_*_windows_*.exe work/release-assets/Toolsiano_*_windows_*.exe.sha256 work/release-assets/SHA256SUMS.txt work/release-assets/toolsiano-source.zip

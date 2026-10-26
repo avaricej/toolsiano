@@ -1,6 +1,6 @@
 import { t } from '../../lib/i18n.ts';
 import { PDFDocument, degrees } from 'pdf-lib';
-import { pdfjs, openPdf, plainMetadata } from './pdf.ts';
+import { renderPdf, openPdf, plainMetadata } from './pdf.ts';
 import {
   $,
   value,
@@ -60,10 +60,7 @@ export function initPages() {
             try {
               const source = entry.source;
               if (!source.reader) {
-                const lib = await pdfjs();
-                source.task = lib.getDocument({
-                  data: new Uint8Array(await source.file.arrayBuffer()),
-                });
+                source.task = await renderPdf(new Uint8Array(await source.file.arrayBuffer()));
                 source.reader = await source.task.promise;
               }
               const page = await source.reader.getPage(entry.index + 1);

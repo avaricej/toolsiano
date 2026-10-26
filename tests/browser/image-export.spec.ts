@@ -51,8 +51,15 @@ test('exports actual AVIF with alpha using same-origin WASM and reopens its own 
   expect(avif.name).toMatch(/\.avif$/);
   expect(avif.bytes.subarray(4, 8).toString()).toBe('ftyp');
   expect(await avifDimensions(new Blob([avif.bytes]))).toEqual([40, 20]);
-  expect((await pixel(page, avif.bytes, 'image/avif', 5))[0]).toBeGreaterThan(180);
-  expect((await pixel(page, avif.bytes, 'image/avif', 35))[3]).toBe(0);
+  // Reopen through the application's decoder: native AVIF is absent in some WebKit builds.
+  await page.locator('#files').setInputFiles({ name: 'exported.avif', mimeType: 'image/avif', buffer: avif.bytes });
+  await expect(page.locator('#image-preview canvas')).toBeVisible();
+  await page.locator('#image-format').selectOption('image/png');
+  await page.locator('#process').click();
+  const reopened = await download(page);
+  expect((await pixel(page, reopened.bytes, 'image/png', 5))[0]).toBeGreaterThan(180);
+  expect((await pixel(page, reopened.bytes, 'image/png', 35))[3]).toBe(0);
+  await page.locator('#files').setInputFiles({ name: 'source.svg', mimeType: 'image/svg+xml', buffer: Buffer.from(svg) });
   await page.locator('#image-format').selectOption('image/svg+xml');
   await expect(page.locator('#image-quality')).toBeDisabled();
   await expect(page.locator('#image-format-note')).toContainText('not vectorization');

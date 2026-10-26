@@ -6,6 +6,7 @@ import { preferredDesktopLocale } from '../src/lib/runtime.ts';
 import { createHash } from 'node:crypto';
 import { nativeLicenses } from './native-licenses.mjs';
 import { simplifyDesktop } from './desktop-layout.mjs';
+import { origins } from './localize.mjs';
 const root = path.resolve(import.meta.dirname, '..');
 const work = path.join(root, 'work');
 const output = path.join(work, 'desktop-dist');
@@ -31,6 +32,7 @@ for (const name of [
   'ru',
   '_astro',
   'icons',
+  'pdfjs',
   'favicon.svg',
   'theme.js',
   'desktop.css',
@@ -54,7 +56,7 @@ async function walk(directory) {
     document.documentElement.dataset.runtime = 'desktop';
     simplifyDesktop(document, process.env.TOOLSIANO_DESKTOP_ARCH || 'x64');
     for (const node of document.querySelectorAll(
-      'link[rel="manifest"],link[rel="canonical"],link[hreflang],#offline-dialog,#offline-install,a[href$="/download/"]',
+      'link[rel="manifest"],link[rel="canonical"],link[hreflang],#offline-dialog,#offline-install,a[href$="/download/"]:not([data-updates-download])',
     ))
       node.remove();
     const local = document.querySelector('.local-pill');
@@ -76,6 +78,28 @@ async function walk(directory) {
         for (const child of [...node.childNodes]) replaceText(child);
     };
     replaceText(document.body);
+    if (file.endsWith(path.join('security', 'index.html'))) {
+      const headings = [...document.querySelectorAll('main h2')];
+      const storage = headings.find(node => /Что хранится|What is stored/.test(node.textContent));
+      if (storage?.nextElementSibling)
+        storage.nextElementSibling.textContent = en
+          ? 'Theme and language are saved locally. Navigation layout is kept for the app session. Inputs and results stay in page memory; saved files remain on your disk. The desktop app does not use a browser offline cache.'
+          : 'Тема и язык сохраняются локально. Вид навигации запоминается на сеанс приложения. Исходные данные и результаты находятся в памяти страницы; сохранённые файлы остаются на диске. Десктопное приложение не использует браузерный офлайн-кеш.';
+      const checks = document.querySelector('main ol');
+      if (checks) {
+        checks.replaceChildren();
+        for (const text of (en
+          ? ['Disconnect from the internet before starting the app.', 'Open a tool, process a test file and save the result.', 'Review the bundled source code and dependency licenses on the Libraries page.']
+          : ['Отключите интернет перед запуском приложения.', 'Откройте инструмент, обработайте тестовый файл и сохраните результат.', 'Изучите исходный код и лицензии зависимостей на странице «Библиотеки и исходный код».'])) {
+          const item = document.createElement('li'); item.textContent = text; checks.append(item);
+        }
+      }
+      const cleanup = headings.find(node => /Очистка|Cleanup/.test(node.textContent));
+      if (cleanup?.nextElementSibling)
+        cleanup.nextElementSibling.textContent = en
+          ? 'Clearing results releases references to processed files. Closing the app ends processing. Theme and language can be changed in the interface; local app data can be removed using your operating system. Saved output files are managed separately.'
+          : 'Очистка результатов освобождает ссылки на обработанные файлы. Закрытие приложения завершает обработку. Тему и язык можно изменить в интерфейсе, а локальные данные приложения — удалить средствами операционной системы. Сохранённые результаты удаляются отдельно.';
+    }
     if (file.endsWith(path.join('libraries', 'index.html'))) {
       const paragraph = document.createElement('p');
       const link = document.createElement('a');
@@ -88,14 +112,27 @@ async function walk(directory) {
       document.querySelector('main article').append(paragraph);
     }
     if (file.endsWith(path.join('privacy', 'index.html'))) {
+      const contact = document.querySelector('a[href^="mailto:"]')?.cloneNode(true);
       document.querySelector('main').innerHTML = en
         ? `<article class="prose"><h1>Desktop privacy</h1><p>Images, PDFs, passwords and QR codes are processed locally. No usage analytics, installation identifiers, automatic updates or file uploads are included.</p><h2>Local storage</h2><p>Your theme and language preferences are saved locally. The navigation layout is kept only for the current app session. Inputs and results stay in memory until you leave the page or close the app. Files you save remain on your disk.</p><h2>File access</h2><p>You choose inputs using the system file picker or drag and drop. Saving a result requires choosing a file in the native save dialog. The app does not have general filesystem read permission.</p><h2>Network</h2><p>The app loads its pages and libraries from the installed package. Clicking an external HTTPS link opens your system browser; the destination service then processes network data under its own policy. There are no background update checks.</p><h2>Downloads</h2><p>GitHub may count installer downloads. These counts do not measure app usage, unique users or installations.</p><h2>Limits</h2><p>Local processing does not protect against malware, compromised operating systems or malicious extensions. Clipboard contents and saved files are controlled by your operating system.</p><a href="/en/libraries/">Libraries and source code</a></article>`
         : `<article class="prose"><h1>Приватность приложения</h1><p>Изображения, PDF, пароли и QR-коды обрабатываются локально. Аналитики использования, идентификаторов установки, автоматических обновлений и отправки файлов нет.</p><h2>Локальное хранение</h2><p>Тема и язык интерфейса сохраняются локально. Вид навигации запоминается только на текущий сеанс приложения. Исходные данные и результаты находятся в памяти до перехода на другую страницу или закрытия приложения. Сохранённые файлы остаются на вашем диске.</p><h2>Доступ к файлам</h2><p>Вы выбираете исходные файлы через системное окно или перетаскиванием. Для сохранения результата нужно выбрать файл в системном диалоге. Общего разрешения на чтение файловой системы у приложения нет.</p><h2>Сеть</h2><p>Страницы и библиотеки загружаются из установленного пакета. Внешняя HTTPS-ссылка открывается в системном браузере, после чего действуют правила обработки сетевых данных соответствующего сервиса. Фоновых проверок обновлений нет.</p><h2>Скачивания</h2><p>GitHub может учитывать скачивания установщиков. Это не статистика использования приложения, уникальных людей или установок.</p><h2>Ограничения</h2><p>Локальная обработка не защищает от вредоносных программ и скомпрометированной операционной системы. Буфер обмена и сохранённые файлы находятся под управлением вашей системы.</p><a href="/ru/libraries/">Библиотеки и исходный код</a></article>`;
+      if (contact) {
+        const heading = document.createElement('h2');
+        heading.textContent = en ? 'Contact' : 'Контакты';
+        const paragraph = document.createElement('p');
+        paragraph.append(contact);
+        document.querySelector('main article').append(heading, paragraph);
+      }
     }
     for (const anchor of document.querySelectorAll('a[href]')) {
       const href = anchor.getAttribute('href');
-      if (href.startsWith('/') && href.endsWith('/'))
-        anchor.setAttribute('href', href + 'index.html');
+      if (anchor.hasAttribute('data-updates-download'))
+        anchor.setAttribute('href', new URL(`/${en ? 'en' : 'ru'}/download/`, origins[en ? 'en' : 'ru']).href);
+      else if (href.startsWith('/') && !href.startsWith('//')) {
+        const url = new URL(href, 'https://tauri.localhost');
+        if (url.pathname.endsWith('/')) url.pathname += 'index.html';
+        anchor.setAttribute('href', url.pathname + url.search + url.hash);
+      }
     }
     await writeFile(file, '<!doctype html>\n' + document.documentElement.outerHTML);
   }

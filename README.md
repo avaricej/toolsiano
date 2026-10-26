@@ -73,6 +73,8 @@ The web version saves only the theme preference in localStorage. The desktop app
 
 ## Desktop download pages and owner statistics
 
+`/ru/changelog/` and `/en/changelog/` list prepared versions independently of GitHub installer publication and are included in the offline copy. Maintain `src/data/changelog.json` newest-first with ISO dates and `ru`/`en` change text. The footer version is read from `package.json`. Rebuild the site after changes; installed desktop copies require rebuilt installers to receive the new page. Changelog entries do not publish installers or create download links.
+
 `/ru/download/` and `/en/download/` are static localized pages, linked in navigation and the footer. They highlight the visitor's desktop OS locally without storing or transmitting it; all platforms remain visible. Mobile devices are not treated as desktop. Pages use the normal canonical, hreflang, sitemap and offline cache pipeline.
 
 A Tauri desktop implementation is included in src-tauri/. No desktop binary or GitHub repository has been published yet. The checked-in `src/data/desktop-releases.json` intentionally contains no releases, and the page clearly says builds are not available. The browser offline copy remains a separate feature. See src-tauri/README.md for native builds, permissions and release requirements.
@@ -119,8 +121,18 @@ The footer's “Offline access” dialog shows local copy status and save date, 
 
 GitHub Actions checks Chromium, Firefox and WebKit on Linux and builds/smoke-tests the Docker image without deploying it. Select a local engine with `PLAYWRIGHT_BROWSER=firefox` or `webkit` after `npx playwright install firefox webkit`. `PLAYWRIGHT_BASE_URL` selects a running QA server. WebKit automation does not prove behavior on a physical iPhone. Docker build origins are passed through Compose's `PUBLIC_EN_ORIGIN` and `PUBLIC_RU_ORIGIN` arguments. Native Canvas filters have a bounded-strip pixel fallback for WebKit versions that lack them.
 
+## Feedback and manual desktop updates
+
+The footer and About page provide Report a bug. The mailto draft includes only the build version, an allowlisted tool name, interface language and web/desktop context. No file names, content, query strings, logs or device identifiers are collected or attached. Sending requires the user's mail client and explicit send action. The native opener allows only the support recipient with subject/body parameters.
+
+Desktop navigation links to About → App updates. It shows the installed version and opens the localized website download page or GitHub Releases in the system browser on request. There are no background checks or automatic installations. Publishing an installer does not update the site's static release catalog: run desktop:sync after publishing stable releases.
+
+AVIF input first uses native browser decoding. If unavailable, a bundled single-thread libavif/libaom WASM worker decodes up to 4 MP (2 MP on narrow screens/x86), with a 20-second timeout; the worker terminates after each image. Both codecs are included in the offline copy. Output is 8-bit RGBA, so original HDR/color profiles are not preserved. Decoder component licenses are included with the existing AVIF notices.
+
 ## Source and licenses
 
-Each build includes `toolsiano-source.zip`, dependency license notices and SHA-256 metadata in `build-info.json`. Dependencies are pinned by `package-lock.json`. `npm audit` is useful but is not an independent security audit. Application code is MIT-licensed; third-party license notices are included. The actual repository URL can be added to the libraries page after creating the repository.
+Each build includes `toolsiano-source.zip`, dependency license notices and SHA-256 metadata in `build-info.json`. Dependencies are pinned by `package-lock.json`. `npm audit` is useful but is not an independent security audit. Application code is MIT-licensed; third-party license notices are included. The project repository is https://github.com/avaricej/toolsiano.
+
+PDF.js CMaps, standard fonts, ICC profiles and image decoders are copied from the pinned npm package into `pdfjs/` in both web and desktop builds and included in the offline copy. All renderers use these local paths, including JPEG 2000/JBIG2 decoding. Toolsiano does not use the optional QuickJS PDF scripting interpreter. Nested PDF.js license files are preserved alongside resources and appended to `third-party-licenses.txt`; the separate AVIF component notices are also included. Keep these notices when distributing builds.
 
 Desktop UI: native-only collapsible navigation, optional settings/help disclosures and sticky primary actions. Windows x86 is a separate build with conservative memory limits; see src-tauri/README.md. Web layout is unchanged.

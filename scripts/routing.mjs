@@ -22,7 +22,7 @@ export function routeRequest(path, host) {
   if (parts[0] === 'compressor') parts[0] = 'file-compressor';
   if (
     !['en', 'ru'].includes(parts[0]) &&
-    [...tools.map((t) => t.slug), 'about', 'security', 'privacy', 'libraries', 'download'].includes(parts[0]) &&
+    [...tools.map((t) => t.slug), 'about', 'security', 'privacy', 'libraries', 'download', 'changelog'].includes(parts[0]) &&
     parts.length === 1
   )
     return { status: 301, location: '/' + lang + '/' + parts[0] + '/' };
@@ -31,7 +31,7 @@ export function routeRequest(path, host) {
     !path.endsWith('/') &&
     (parts.length === 1 ||
       (parts.length === 2 &&
-        [...tools.map((t) => t.slug), 'about', 'security', 'privacy', 'libraries', 'download'].includes(
+        [...tools.map((t) => t.slug), 'about', 'security', 'privacy', 'libraries', 'download', 'changelog'].includes(
           parts[1],
         )))
   )

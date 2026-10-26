@@ -4,6 +4,7 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 import { t } from '../lib/i18n';
 import { safeFilename } from '../lib/runtime';
 import { resultLimit } from '../lib/resources';
+import { isSupportEmailUrl } from '../lib/feedback';
 
 let saving = false;
 export async function saveDesktopFile(blob: Blob, name: string) {
@@ -105,7 +106,7 @@ export function initDesktop(notify: (message: string) => void) {
       return;
     }
     event.preventDefault();
-    if (url.protocol !== 'https:' && url.href !== 'mailto:to@bxstudio.ru') return;
+    if (url.protocol !== 'https:' && !isSupportEmailUrl(url)) return;
     try {
       await openUrl(url.href);
     } catch {
