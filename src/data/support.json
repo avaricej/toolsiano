@@ -1,0 +1,30 @@
+{
+  "enabled": true,
+  "links": {
+    "russia": "",
+    "international": ""
+  },
+  "text": {
+    "trigger": { "ru": "Поддержать проект", "en": "Support the project" },
+    "title": { "ru": "Поддержать Toolsiano", "en": "Support Toolsiano" },
+    "description": {
+      "ru": "Если Toolsiano вам полезен, вы можете поддержать его развитие и оплату сервера. Это добровольно — все инструменты остаются бесплатными.",
+      "en": "If you find Toolsiano useful, you can help fund its development and hosting. Support is optional — all tools remain free."
+    },
+    "russiaLabel": { "ru": "Оплата российской картой", "en": "Russian card payments" },
+    "russiaProvider": {
+      "ru": "Для пользователей российских платёжных сервисов",
+      "en": "For users of Russian payment services"
+    },
+    "internationalLabel": { "ru": "Международные платежи", "en": "International payments" },
+    "internationalProvider": {
+      "ru": "Для пользователей международных платёжных сервисов",
+      "en": "For users of international payment services"
+    },
+    "unavailable": { "ru": "Способ пока недоступен", "en": "Currently unavailable" },
+    "privacy": {
+      "ru": "Оплата откроется на внешнем сайте. Платёжные данные обрабатывает выбранный сервис по своим правилам. Toolsiano не отслеживает нажатия на эти ссылки.",
+      "en": "Payment opens on an external website. The selected service handles payment data under its own policies. Toolsiano does not track clicks on these links."
+    }
+  }
+}

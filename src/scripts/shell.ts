@@ -9,15 +9,17 @@ export function notify(message: string) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => (toast.hidden = true), 6000);
 }
-const themeToggle = document.getElementById('theme-toggle');
-themeToggle?.setAttribute(
-  'aria-pressed',
-  String(document.documentElement.dataset.theme === 'dark'),
-);
-themeToggle?.addEventListener('click', () => {
-  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = theme;
-  themeToggle.setAttribute('aria-pressed', String(theme === 'dark'));
+const themeMode = document.getElementById('theme-mode') as HTMLSelectElement | null;
+function updateThemeControl() {
+  if (themeMode) themeMode.value = document.documentElement.dataset.themePreference || 'system';
+}
+updateThemeControl();
+document.addEventListener('toolsiano-theme-applied', updateThemeControl);
+themeMode?.addEventListener('change', () => {
+  const theme = themeMode.value;
+  if (!['system', 'light', 'dark'].includes(theme)) return;
+  document.documentElement.dataset.themePreference = theme;
+  document.dispatchEvent(new Event('toolsiano-theme-change'));
   try {
     localStorage.setItem('toolsiano-theme', theme);
   } catch {
@@ -45,7 +47,7 @@ menu?.addEventListener('click', () => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && sidebar.classList.contains('open')) closeMenu(true);
   if (e.key === 'Tab' && mobile.matches && sidebar.classList.contains('open')) {
-    const links = [...sidebar.querySelectorAll<HTMLAnchorElement>('a[href]')];
+    const links = [...sidebar.querySelectorAll<HTMLElement>('a[href],button:not([disabled])')];
     const first = links[0],
       last = links[links.length - 1],
       active = document.activeElement;
@@ -109,6 +111,15 @@ document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) =>
     filter();
   }),
 );
+
+const supportDialog = document.getElementById('support-dialog') as HTMLDialogElement | null;
+document.querySelectorAll<HTMLButtonElement>('[data-support-open]').forEach((button) => {
+  button.addEventListener('click', () => {
+    closeMenu();
+    if (supportDialog && !supportDialog.open) supportDialog.showModal();
+  });
+});
+document.getElementById('support-close')?.addEventListener('click', () => supportDialog?.close());
 
 if (isDesktop()) {
   void import('./desktop.ts').then(({ initDesktop }) => initDesktop(notify));

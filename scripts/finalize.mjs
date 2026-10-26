@@ -78,7 +78,7 @@ for (const file of files) {
 const release = createHash('sha256').update(JSON.stringify(hashes)).digest('hex').slice(0, 16);
 await writeFile(
   path.join(dist, 'build-info.json'),
-  JSON.stringify({ version: '1.0.0', release, files: hashes }, null, 2),
+  JSON.stringify({ version: lock.version, release, files: hashes }, null, 2),
 );
 const routes = files
   .map((f) => '/' + path.relative(dist, f).replaceAll('\\', '/'))

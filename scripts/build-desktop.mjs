@@ -104,7 +104,7 @@ await walk(output);
 const choose = preferredDesktopLocale.toString();
 await writeFile(
   path.join(output, 'desktop-start.js'),
-  `let saved=null;try{saved=localStorage.getItem('toolsiano-language')}catch{};const choose=${choose};location.replace('/'+choose(saved,navigator.language)+'/index.html');`,
+  `let saved=null;try{saved=localStorage.getItem('toolsiano-language')}catch{};const choose=${choose};const lang=choose(saved,navigator.language,window.__TOOLSIANO_INSTALLER_LANGUAGE__||null);try{localStorage.setItem('toolsiano-language',lang)}catch{};location.replace('/'+lang+'/index.html');`,
 );
 await writeFile(
   path.join(output, 'index.html'),

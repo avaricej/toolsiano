@@ -251,7 +251,19 @@ small {
   align-items: center;
   gap: 17px;
 }
+.topbar-left {
+  min-width: 0;
+  flex: 1;
+}
+.topbar-actions,
+.mobile-toggle {
+  flex-shrink: 0;
+}
 .breadcrumb {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 11px;
   color: var(--muted);
 }
@@ -869,12 +881,60 @@ dialog {
 dialog::backdrop {
   background: #0008;
 }
+html:not([data-runtime='desktop']) .support-nav {
+  display: none;
+}
+html[data-runtime='desktop'] .support-footer {
+  display: none;
+}
+button.support-nav {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+button.support-nav:hover {
+  background: var(--surface-2);
+}
+.support-methods {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0;
+}
+.support-method {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.support-method .button {
+  width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+.support-method p,
+.support-method small {
+  font-size: 13px;
+  margin: 8px 0 0;
+}
 .dialog-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
   margin-bottom: 18px;
+}
+.theme-select {
+  width: 132px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 8px;
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 7px;
 }
 dialog p {
   margin: 14px 0;

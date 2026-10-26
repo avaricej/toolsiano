@@ -1,5 +1,7 @@
 # Localized installer license
 
+The same `licenses.nsh` hook also writes the initial installer language (`ru`/`en`) to `toolsiano-language.txt` in the application directory. Existing files are retained during installation; uninstall removes the file. The app's saved language preference has priority over this initial setting. No extra frontend filesystem permission is granted.
+
 `template.nsi` is the stock Tauri NSIS template from the pinned CLI 2.12.4:
 https://github.com/tauri-apps/tauri/blob/tauri-cli-v2.12.4/crates/tauri-bundler/src/bundle/windows/nsis/installer.nsi
 

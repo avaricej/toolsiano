@@ -14,7 +14,7 @@ test('catalog filters, search, theme, responsive navigation', async ({ page }) =
   await page.getByRole('button', { name: 'Все инструменты', exact: true }).click();
   await page.getByRole('searchbox').fill('парол');
   await expect(page.locator('.tool-card:visible')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Переключить тему' }).click();
+  await page.getByRole('combobox', { name: 'Тема оформления' }).selectOption('dark');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Открыть меню' }).click();
   await expect(page.locator('#sidebar')).toHaveClass(/open/);

@@ -2,8 +2,14 @@ export function isDesktop() {
   return typeof document !== 'undefined' && document.documentElement.dataset.runtime === 'desktop';
 }
 
-export function preferredDesktopLocale(saved: string | null, language: string) {
-  return saved === 'ru' || saved === 'en' ? saved : /^ru(?:-|$)/i.test(language) ? 'ru' : 'en';
+export function preferredDesktopLocale(
+  saved: string | null,
+  language: string,
+  installer: string | null = null,
+) {
+  if (saved === 'ru' || saved === 'en') return saved;
+  if (installer === 'ru' || installer === 'en') return installer;
+  return /^ru(?:-|$)/i.test(language) ? 'ru' : 'en';
 }
 
 export function safeFilename(name: string) {

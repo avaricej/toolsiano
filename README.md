@@ -1,5 +1,9 @@
 # Toolsiano
 
+## Optional project support links
+
+Edit `src/data/support.json`: `links.russia` and `links.international` accept full HTTPS payment-page URLs. Empty URLs keep the corresponding option disabled; `enabled: false` hides all support entry points. All dialog copy and button labels live in `text`, with `ru` and `en` translations in the same file. Provider descriptions should name the selected payment service; only list payment methods it actually accepts. No payment widgets, click tracking or test payment URLs are included. The web footer and About page open the dialog; the desktop sidebar also includes a heart button. External payment links open in a new browser tab (web) or the system browser (desktop). Rebuild the website and desktop installers after changes. See the support configuration section in `README.ru.md` for field-by-field instructions.
+
 Private tools for images, PDFs, passwords and QR codes. Russian and English. Static Astro + TypeScript; processing happens in the browser. No accounts, analytics, view counters, external CDNs or file-upload backend. The `old/` website is not part of this project.
 
 ## Run locally

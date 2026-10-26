@@ -9,6 +9,11 @@ test('desktop language uses the saved choice before the system language', () => 
   assert.equal(preferredDesktopLocale('ru', 'en-US'), 'ru');
   assert.equal(preferredDesktopLocale('en', 'ru-RU'), 'en');
   assert.equal(preferredDesktopLocale('../../bad', 'fr'), 'en');
+  assert.equal(preferredDesktopLocale(null, 'en-US', 'ru'), 'ru');
+  assert.equal(preferredDesktopLocale(null, 'ru-RU', 'en'), 'en');
+  assert.equal(preferredDesktopLocale('en', 'ru-RU', 'ru'), 'en');
+  assert.equal(preferredDesktopLocale('ru', 'en-US', 'en'), 'ru');
+  assert.equal(preferredDesktopLocale(null, 'ru-RU', 'invalid'), 'ru');
   assert.equal(safeFilename('../../private/result.png'), 'result.png');
   assert.equal(safeFilename('C:\\data\\result?.pdf'), 'result_.pdf');
 });

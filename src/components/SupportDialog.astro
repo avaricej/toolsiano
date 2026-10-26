@@ -1,0 +1,64 @@
+---
+import support from '../data/support.json';
+const methods = [
+  {
+    url: support.links.russia,
+    label: support.text.russiaLabel.ru,
+    provider: support.text.russiaProvider.ru,
+  },
+  {
+    url: support.links.international,
+    label: support.text.internationalLabel.ru,
+    provider: support.text.internationalProvider.ru,
+  },
+];
+for (const method of methods) {
+  if (!method.url) continue;
+  const url = new URL(method.url);
+  if (url.protocol !== 'https:' || url.username || url.password)
+    throw new Error(
+      'Support links must be HTTPS URLs without credentials. Edit src/data/support.json.',
+    );
+}
+---
+
+{support.enabled && (
+  <dialog
+    id="support-dialog"
+    aria-labelledby="support-title"
+    aria-describedby="support-description"
+  >
+    <div class="dialog-heading">
+      <h2 id="support-title">{support.text.title.ru}</h2>
+      <button id="support-close" type="button" class="button secondary" autofocus>
+        Закрыть
+      </button>
+    </div>
+    <p id="support-description">{support.text.description.ru}</p>
+    <div class="support-methods">
+      {methods.map((method) => (
+        <div class="support-method">
+          {method.url ? (
+            <a
+              class="button secondary"
+              href={method.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+            >
+              {method.label}
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          ) : (
+            <button class="button secondary" type="button" disabled>
+              {method.label}
+            </button>
+          )}
+          <p class="muted">{method.provider}</p>
+          {!method.url && <small>{support.text.unavailable.ru}</small>}
+        </div>
+      ))}
+    </div>
+    <p class="muted">{support.text.privacy.ru}</p>
+  </dialog>
+)}

@@ -42,6 +42,6 @@ test('desktop and mobile visual review captures', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/en/');
   await page.screenshot({ path: 'outputs/preview-mobile.png', fullPage: true });
-  await page.getByRole('button', { name: 'Toggle theme' }).click();
+  await page.getByRole('combobox', { name: 'Color theme' }).selectOption('dark');
   await page.screenshot({ path: 'outputs/preview-dark.png' });
 });

@@ -1,6 +1,6 @@
 [package]
 name = "toolsiano-desktop"
-version = "1.0.0"
+version = "1.0.1"
 description = "Private offline tools for images, PDFs, passwords and QR codes"
 authors = ["Toolsiano"]
 license = "MIT"

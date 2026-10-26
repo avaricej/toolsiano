@@ -1,6 +1,8 @@
 ---
 import Icon from '../components/Icon.astro';
 import OfflineDialog from '../components/OfflineDialog.astro';
+import SupportDialog from '../components/SupportDialog.astro';
+import support from '../data/support.json';
 import { tools } from '../data/tools';
 import '../styles/global.css';
 const {
@@ -64,6 +66,18 @@ const path = Astro.url.pathname;
         </div>
       ))}
       <div class="sidebar-bottom">
+        {support.enabled && (
+          <button
+            type="button"
+            class="nav-link support-nav"
+            data-support-open
+            aria-haspopup="dialog"
+            aria-controls="support-dialog"
+          >
+            <Icon name="heart" size={18} />
+            {support.text.trigger.ru}
+          </button>
+        )}
         <a
           class:list={['nav-link', { selected: path === '/download/' }]}
           href="/download/"
@@ -129,9 +143,11 @@ const path = Astro.url.pathname;
             <Icon name="lock" size={14} />
             Локально в браузере
           </span>
-          <button id="theme-toggle" class="icon-button" aria-label="Переключить тему">
-            <Icon name="sun" size={20} />
-          </button>
+          <select id="theme-mode" class="theme-select" aria-label="Тема оформления">
+            <option value="system">Как в системе</option>
+            <option value="light">Светлая</option>
+            <option value="dark">Тёмная</option>
+          </select>
         </div>
       </header>
       <main id="main">
@@ -143,6 +159,17 @@ const path = Astro.url.pathname;
           <span class="muted">· Сделано с уважением к вашим данным</span>
         </span>
         <div>
+          {support.enabled && (
+            <button
+              type="button"
+              class="text-button support-footer"
+              data-support-open
+              aria-haspopup="dialog"
+              aria-controls="support-dialog"
+            >
+              {support.text.trigger.ru}
+            </button>
+          )}
           <a href="/about/">О проекте</a>
           <a href="/download/">Скачать приложение</a>
           <a href="/security/">Приватность</a>
@@ -153,6 +180,7 @@ const path = Astro.url.pathname;
       </footer>
     </div>
     <OfflineDialog />
+    <SupportDialog />
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
     <script>
       import '../scripts/shell';

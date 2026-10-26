@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import support from '../data/support.json';
 ---
 
 <Layout
@@ -28,6 +29,19 @@ import Layout from '../layouts/Layout.astro';
       Генерация паролей использует Web Crypto. QR-коды читаются как текст без автоматического
       открытия ссылок. OCR и HEIC отложены до отдельной проверки производительности.
     </p>
+    {support.enabled && (
+      <p>
+        <button
+          type="button"
+          class="button secondary"
+          data-support-open
+          aria-haspopup="dialog"
+          aria-controls="support-dialog"
+        >
+          {support.text.trigger.ru}
+        </button>
+      </p>
+    )}
     <h2>Обратная связь</h2>
     <p>
       <a href="mailto:to@bxstudio.ru">to@bxstudio.ru</a>
