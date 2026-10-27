@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -16,8 +16,8 @@ jobs:
     env:
       PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -38,8 +38,8 @@ jobs:
           - architecture: x86
             target: i686-pc-windows-msvc
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -48,14 +48,14 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run desktop:build -- --target ${{ matrix.target }} --bundles nsis -- --locked
       - run: node scripts/package-desktop.mjs --architecture ${{ matrix.architecture }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: release-windows-${{ matrix.architecture }}
           path: work/desktop-packages
           retention-days: 14
   draft:
     needs: windows
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
       actions: read
@@ -63,11 +63,11 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           pattern: release-windows-*
           path: work/release-assets

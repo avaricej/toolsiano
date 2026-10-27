@@ -24,6 +24,7 @@ test('release CLI imports metadata, saves aggregate reports and preserves the ca
       `
       globalThis.fetch = async url => {
         if (!String(url).startsWith('https://api.github.com/repos/example/toolsiano/releases?')) throw new Error('Unexpected URL');
+        if (process.env.API_LIMIT) return Response.json({message:'API rate limit exceeded'}, {status:403,headers:{'x-ratelimit-remaining':'0','x-ratelimit-reset':'4102444800'}});
         return Response.json([{ tag_name: 'v1.0.0', published_at: '2026-10-25T12:00:00Z', draft: false, prerelease: false, assets: [
           { id: 1, name: 'Toolsiano_x64.exe', state: 'uploaded', size: 12345, download_count: 42, digest: process.env.BAD_DIGEST ? '' : 'sha256:' + 'a'.repeat(64), browser_download_url: 'https://github.com/example/toolsiano/releases/download/v1.0.0/Toolsiano_x64.exe' },
           { id: 2, name: 'source.zip', state: 'uploaded', size: 99, download_count: 100 }
@@ -34,7 +35,13 @@ test('release CLI imports metadata, saves aggregate reports and preserves the ca
     const run = (file: string, env = process.env) =>
       execFileSync(
         process.execPath,
-        ['--import', pathToFileURL(mock).href, path.join(root, 'scripts', file), '--repo', 'example/toolsiano'],
+        [
+          '--import',
+          pathToFileURL(mock).href,
+          path.join(root, 'scripts', file),
+          '--repo',
+          'example/toolsiano',
+        ],
         { cwd: root, env, stdio: 'pipe' },
       );
     run('sync-desktop-releases.mjs');
@@ -50,6 +57,24 @@ test('release CLI imports metadata, saves aggregate reports and preserves the ca
     assert.ok(report.includes('<strong>42</strong>'));
     assert.ok(!report.includes('source.zip'));
     assert.ok(!report.includes('<script'));
+    let failure: any;
+    try {
+      run('download-stats.mjs', {
+        ...process.env,
+        API_LIMIT: '1',
+        GH_TOKEN: 'synthetic-secret-token',
+      });
+    } catch (error) {
+      failure = error;
+    }
+    assert.ok(failure);
+    assert.match(failure.stderr.toString(), /Превышен лимит/);
+    assert.ok(!failure.stderr.toString().includes('at fetchReleases'));
+    assert.ok(!failure.stderr.toString().includes('synthetic-secret-token'));
+    assert.equal(
+      await readFile(path.join(root, 'work/download-statistics/index.html'), 'utf8'),
+      report,
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }

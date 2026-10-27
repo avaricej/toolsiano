@@ -4,7 +4,7 @@ permissions:
   contents: read
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -12,8 +12,8 @@ jobs:
     env:
       PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -23,18 +23,27 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
       - run: npm run test:e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: toolsiano-dist-${{ matrix.browser }}
           path: dist
           retention-days: 14
   container:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
       - run: docker build -t toolsiano:test .
       - run: docker run -d --name toolsiano-test -p 8080:80 -e SITE_ADDRESS=:80 toolsiano:test
-      - run: curl --fail --retry 10 --retry-connrefused --retry-delay 1 http://localhost:8080/ru/
-      - run: test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ru/missing/)" = 404
+      - name: Wait for Caddy and check HTTP responses
+        run: node scripts/check-container.mjs http://127.0.0.1:8080
+      - name: Container diagnostics
+        if: failure()
+        run: |
+          docker ps -a --filter name=toolsiano-test
+          docker logs toolsiano-test
       - if: always()
         run: docker rm -f toolsiano-test
