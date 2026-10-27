@@ -1,4 +1,27 @@
 {
-  "repository": null,
-  "releases": []
+  "repository": "avaricej/toolsiano",
+  "releases": [
+    {
+      "tag": "v1.0.5",
+      "date": "2026-10-27T07:00:14Z",
+      "assets": [
+        {
+          "name": "Toolsiano_1.0.5_windows_x64.exe",
+          "platform": "windows",
+          "architecture": "x64",
+          "size": 223941008,
+          "url": "https://github.com/avaricej/toolsiano/releases/download/v1.0.5/Toolsiano_1.0.5_windows_x64.exe",
+          "sha256": "280c67d3bc2230230fc9b0d4d25dfe5890e5af93211a9e705eed8a2587f1d4f0"
+        },
+        {
+          "name": "Toolsiano_1.0.5_windows_x86.exe",
+          "platform": "windows",
+          "architecture": "x86",
+          "size": 200258788,
+          "url": "https://github.com/avaricej/toolsiano/releases/download/v1.0.5/Toolsiano_1.0.5_windows_x86.exe",
+          "sha256": "b6a7a0f00d6b3eedd635fe6b2c0a4dd90ab285027191f742857422b9921b6c86"
+        }
+      ]
+    }
+  ]
 }
